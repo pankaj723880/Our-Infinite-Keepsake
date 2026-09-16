@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Our Infinite Keepsake | For My Love</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Italianno&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Reenie+Beanie&family=Sacramento&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- GSAP & Draggable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- YouTube IFrame Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <style>
+    :root {
+      --bg-dark: #08060c;
+      --amber-glow: rgba(234, 179, 8, 0.15);
+      --rose-gold: #e2a89d;
+      --crimson-deep: #5e1122;
+      --parchment: #fcf6e8;
+      --parchment-border: #d8c29d;
+      --ink: #2b2320;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f1ede6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Ambient noise & star sheen */
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background-image: radial-gradient(rgba(255, 235, 180, 0.04) 1px, transparent 0);
+      background-size: 32px 32px;
+      opacity: 0.8;
+    }
+
+    /* 3D Scene Perspective */
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+
+    /* Envelope wrapper dynamic expansion to prevent overlapping elements below */
+    #envelopeWrapper {
+      transition: margin-bottom 0.7s cubic-bezier(0.34, 1.25, 0.64, 1);
+      margin-bottom: 0px;
+    }
+
+    #envelopeWrapper.opened {
+      margin-bottom: 110px;
+    }
+
+    @media (min-width: 640px) {
+      #envelopeWrapper.opened {
+        margin-bottom: 140px;
+      }
+    }
+
+    /* Glassmorphism Classes */
+    .glass-pill {
+      background: rgba(26, 20, 35, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(243, 208, 169, 0.18);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    .glass-card {
+      background: rgba(18, 14, 25, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 168, 157, 0.22);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Wax Seal Button */
+    .wax-seal {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #b82b40 0%, #820e23 60%, #44040e 100%);
+      box-shadow: 
+        0 4px 15px rgba(0,0,0,0.6),
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        inset 0 -3px 6px rgba(0,0,0,0.6);
+      border: 2px dashed rgba(255, 200, 200, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .wax-seal:hover {
+      transform: scale(1.08) rotate(5deg);
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.6);
+    }
+
+    /* Parchment Paper */
+    .parchment-sheet {
+      background: radial-gradient(circle at 50% 50%, #fffcf5 0%, #f6ecd8 75%, #ebd9b8 100%);
+      color: var(--ink);
+      box-shadow: 
+        0 15px 45px rgba(0,0,0,0.5),
+        inset 0 0 40px rgba(189, 142, 75, 0.15);
+      border: 1px solid var(--parchment-border);
+      border-radius: 6px;
+    }
+
+    /* Draggable Polaroids */
+    .polaroid {
+      background: #ffffff;
+      padding: 12px 12px 28px 12px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.15s ease-out, box-shadow 0.2s ease;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .polaroid:active {
+      cursor: grabbing;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+    }
+
+    .polaroid-inner {
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .polaroid.flipped .polaroid-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* Vinyl Turntable */
+    .vinyl-grooves {
+      background: repeating-radial-gradient(
+        circle at 50% 50%,
+        #151515 0px,
+        #151515 2px,
+        #242424 3px,
+        #151515 4px
+      );
+      box-shadow: 0 8px 30px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    .needle-arm {
+      transform-origin: 18px 18px;
+      transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .needle-arm.playing {
+      transform: rotate(32deg);
+    }
+
+    .spin-slow {
+      animation: spinVinyl 3.5s linear infinite;
+    }
+
+    .spin-paused {
+      animation-play-state: paused !important;
+    }
+
+    @keyframes spinVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Floating particles canvas */
+    #ambientCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    /* Typewriter Cursor */
+    .cursor-blink::after {
+      content: '|';
+      color: #782929;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Rubber Stamp Effect */
+    .rubber-stamp {
+      display: inline-block;
+      padding: 4px 12px;
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 11px;
+      color: #b91c1c;
+      border: 3px solid #b91c1c;
+      border-radius: 6px;
+      letter-spacing: 2px;
+      transform: rotate(-10deg) scale(1);
+      box-shadow: 0 0 0 1px #b91c1c;
+      opacity: 0.92;
+      mask-image: radial-gradient(circle, black 60%, rgba(0,0,0,0.5) 100%);
+    }
+
+    /* Biometric Thumbprint Pulse */
+    .fingerprint-glow {
+      box-shadow: 0 0 35px rgba(244, 63, 94, 0.5), inset 0 0 20px rgba(244, 63, 94, 0.4);
+    }
+
+    /* Custom Scrollbar for Drawer */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 15, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #782929;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen selection:bg-rose-900 selection:text-white">
+  <!-- Ambient Interactive Stardust Canvas -->
+  <canvas id="ambientCanvas"></canvas>
+  <div class="film-grain"></div>
+
+  <!-- Top Glass Navigation Bar -->
+  <header class="relative z-20 w-full px-4 sm:px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center shadow-lg shadow-rose-900/40">
+        <i class="fa-solid fa-heart text-white text-sm animate-pulse"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold tracking-wider uppercase text-amber-200/90 font-['Cinzel_Decorative']">Our Infinite Keepsake</h1>
+        <p class="text-xs text-stone-400" id="headerSubtitle">A timeless sanctuary for our love</p>
+      </div>
+    </div>
+
+    <!-- Actions: Sound & Customizer -->
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <button id="steamyWindowBtn" title="Rainy Window Fog Wipe" class="glass-pill px-3 py-2 rounded-full text-xs flex items-center space-x-1.5 text-blue-200 hover:text-white hover:border-blue-400 transition">
+        <i class="fa-solid fa-cloud-rain text-blue-300"></i>
+        <span class="hidden md:inline">Rainy Glass</span>
+      </button>
+
+      <!-- Music Player Capsule with Prev/Play/Next/Track Menu -->
+      <div class="relative flex items-center">
+        <div class="glass-pill px-2.5 py-1.5 rounded-full text-xs flex items-center space-x-1 sm:space-x-2 text-rose-200 border border-rose-400/20 shadow-lg">
+          <button id="headerPrevTrackBtn" title="Previous Song" class="w-6 h-6 rounded-full hover:bg-white/10 text-stone-300 hover:text-amber-300 transition flex items-center justify-center">
+            <i class="fa-solid fa-backward-step text-[11px]"></i>
+          </button>
+          
+          <button id="audioToggleBtn" title="Toggle Music Playback" class="flex items-center space-x-1.5 px-2 py-0.5 rounded-full hover:bg-white/10 transition text-amber-200">
+            <i class="fa-solid fa-compact-disc text-amber-400" id="audioIcon"></i>
+            <span id="audioBtnText" class="max-w-[85px] sm:max-w-[130px] truncate">Canon d'Amour</span>
+          </button>
+          
+          <button id="headerNextTrackBtn" title="Next Song" class="w-6 h-6 rounded-full hover:bg-white/10 text-stone-300 hover:text-amber-300 transition flex items-center justify-center">
+            <i class="fa-solid fa-forward-step text-[11px]"></i>
+          </button>
+
+          <button id="openTrackMenuBtn" title="Select Track" class="pl-1 text-amber-300 hover:text-white transition flex items-center space-x-1 border-l border-white/15 ml-0.5">
+            <span class="text-[10px] hidden md:inline font-medium">Songs</span>
+            <i class="fa-solid fa-chevron-down text-[9px]"></i>
+          </button>
+        </div>
+
+        <!-- Quick Track Selection Dropdown -->
+        <div id="quickTrackDropdown" class="hidden absolute top-full right-0 mt-2 w-64 glass-card rounded-2xl p-2.5 z-50 border border-amber-400/30 shadow-2xl">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10 px-1 text-[11px]">
+            <span class="font-semibold text-amber-200 flex items-center space-x-1.5">
+              <i class="fa-solid fa-compact-disc text-rose-400"></i>
+              <span>Romantic Song Catalog</span>
+            </span>
+            <span class="text-[9px] text-stone-400">Built-in Chords</span>
+          </div>
+
+          <!-- Dynamic Song List Container -->
+          <div id="trackListOptions" class="space-y-1 max-h-48 overflow-y-auto pr-1"></div>
+
+          <!-- Quick Local MP3 Upload trigger inside dropdown -->
+          <div class="mt-2 pt-2 border-t border-white/10">
+            <label for="headerUploadMp3" class="w-full py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-dashed border-amber-400/40 text-amber-300 hover:text-amber-100 transition flex items-center justify-center space-x-2 text-[11px] cursor-pointer">
+              <i class="fa-solid fa-file-audio text-xs"></i>
+              <span>Upload Local MP3</span>
+            </label>
+            <input type="file" id="headerUploadMp3" accept="audio/*" class="hidden">
+          </div>
+        </div>
+      </div>
+
+      <button id="openCustomizeBtn" class="glass-pill px-3.5 py-2 rounded-full text-xs font-medium text-amber-200 hover:text-white hover:border-amber-400 transition flex items-center space-x-2 shadow-lg">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <span class="hidden sm:inline">Personalize &amp; Share</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Romantic Hub Mode Switcher (Tab Navigation) -->
+  <nav class="relative z-20 max-w-4xl mx-auto px-4 mt-2 mb-6">
+    <div class="glass-pill p-1.5 rounded-2xl flex items-center justify-between sm:justify-center sm:space-x-2 overflow-x-auto text-xs no-scrollbar">
+      <button class="nav-tab active px-3 sm:px-4 py-2 rounded-xl text-amber-200 bg-white/10 font-medium transition flex items-center space-x-1.5 shrink-0" data-section="sectionDesk">
+        <i class="fa-solid fa-envelope-open-text"></i>
+        <span>Keepsake Desk</span>
+      </button>
+      <button class="nav-tab px-3 sm:px-4 py-2 rounded-xl text-stone-300 hover:text-white transition flex items-center space-x-1.5 shrink-0" data-section="sectionOpenWhen">
+        <i class="fa-solid fa-box-archive text-rose-400"></i>
+        <span>"Open When..."</span>
+      </button>
+      <button class="nav-tab px-3 sm:px-4 py-2 rounded-xl text-stone-300 hover:text-white transition flex items-center space-x-1.5 shrink-0" data-section="sectionLoveLock">
+        <i class="fa-solid fa-lock text-amber-400"></i>
+        <span>Love Locks</span>
+      </button>
+      <button class="nav-tab px-3 sm:px-4 py-2 rounded-xl text-stone-300 hover:text-white transition flex items-center space-x-1.5 shrink-0" data-section="sectionConstellation">
+        <i class="fa-solid fa-star text-indigo-300"></i>
+        <span>Night Sky</span>
+      </button>
+      <button class="nav-tab px-3 sm:px-4 py-2 rounded-xl text-stone-300 hover:text-white transition flex items-center space-x-1.5 shrink-0" data-section="sectionPassport">
+        <i class="fa-solid fa-passport text-emerald-400"></i>
+        <span>Bucket List</span>
+      </button>
+      <button class="nav-tab px-3 sm:px-4 py-2 rounded-xl text-stone-300 hover:text-white transition flex items-center space-x-1.5 shrink-0" data-section="sectionHeartbeat">
+        <i class="fa-solid fa-fingerprint text-pink-400"></i>
+        <span>Heartbeat</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-6xl mx-auto px-4 pt-1 pb-28 flex flex-col items-center">
+
+    <!-- Couple Names & Romantic Greeting -->
+    <div class="text-center mt-1 mb-4">
+      <span class="inline-block text-[11px] uppercase tracking-[0.3em] text-rose-300/80 mb-1 font-semibold">Forever &amp; Always</span>
+      <h2 id="coupleNamesDisplay" class="text-3xl sm:text-5xl md:text-6xl font-['Playfair_Display'] font-normal text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-rose-100 to-amber-200 drop-shadow-md">
+        Elena &amp; Lucas
+      </h2>
+    </div>
+
+    <!-- Live Milestone "Days Together" Counter -->
+    <div class="glass-pill rounded-3xl p-4 sm:p-5 mb-8 w-full max-w-2xl border border-amber-500/20 shadow-2xl relative overflow-hidden group">
+      <div class="absolute -inset-1 bg-gradient-to-r from-rose-600/10 via-amber-500/10 to-rose-600/10 rounded-3xl blur-xl opacity-60 pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <div class="flex items-center justify-between mb-3 px-2 text-xs font-medium text-stone-300">
+          <span class="flex items-center space-x-1.5 text-amber-300/90">
+            <i class="fa-regular fa-clock text-xs"></i>
+            <span>Time We've Been In Love</span>
+          </span>
+          <span id="anniversaryDateDisplay" class="text-stone-400 font-serif italic text-xs">Since Oct 14, 2022</span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 sm:gap-4 text-center">
+          <div class="bg-black/30 rounded-2xl py-2 px-1 border border-white/5">
+            <div id="counterDays" class="text-2xl sm:text-4xl font-bold font-['Playfair_Display'] text-amber-200">0</div>
+            <div class="text-[10px] sm:text-xs text-stone-400 tracking-wider uppercase mt-1">Days</div>
+          </div>
+          <div class="bg-black/30 rounded-2xl py-2 px-1 border border-white/5">
+            <div id="counterHours" class="text-2xl sm:text-4xl font-bold font-['Playfair_Display'] text-rose-200">0</div>
+            <div class="text-[10px] sm:text-xs text-stone-400 tracking-wider uppercase mt-1">Hours</div>
+          </div>
+          <div class="bg-black/30 rounded-2xl py-2 px-1 border border-white/5">
+            <div id="counterMinutes" class="text-2xl sm:text-4xl font-bold font-['Playfair_Display'] text-amber-200">0</div>
+            <div class="text-[10px] sm:text-xs text-stone-400 tracking-wider uppercase mt-1">Mins</div>
+          </div>
+          <div class="bg-black/30 rounded-2xl py-2 px-1 border border-white/5">
+            <div id="counterSeconds" class="text-2xl sm:text-4xl font-bold font-['Playfair_Display'] text-rose-200">0</div>
+            <div class="text-[10px] sm:text-xs text-stone-400 tracking-wider uppercase mt-1">Secs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 1: KEEPSAKE DESK (3D Envelope, Polaroids, Reasons)
+         ======================================================== -->
+    <div id="sectionDesk" class="content-section w-full flex flex-col items-center">
+      <!-- 3D Interactive Envelope Section -->
+      <div class="relative w-full max-w-xl mx-auto my-4 flex flex-col items-center">
+        <div id="envelopePrompt" class="text-xs text-stone-400/90 mb-3 flex items-center space-x-2 animate-bounce">
+          <i class="fa-solid fa-hand-pointer text-amber-300"></i>
+          <span>Tap the wax seal to break &amp; read your letter</span>
+        </div>
+
+        <!-- The 3D Envelope Component -->
+        <div id="envelopeWrapper" class="perspective-1000 w-full flex justify-center">
+          <div id="envelope" class="preserve-3d relative w-[310px] sm:w-[440px] h-[210px] sm:h-[270px] bg-[#3a0914] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-rose-950 transition-transform duration-700">
+            
+            <!-- Envelope Back Body Texture -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#4d0c1b] to-[#25040c] rounded-xl overflow-hidden pointer-events-none">
+              <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            </div>
+            <!-- envelope elements -->
+            <!-- The Sliding Parchment Letter (Housed inside the envelope) -->
+            <div id="parchmentLetter" class="absolute left-1/2 -translate-x-1/2 top-4 w-[280px] sm:w-[400px] h-[340px] sm:h-[460px] parchment-sheet p-5 sm:p-7 shadow-2xl z-10 flex flex-col justify-between transition-all duration-1000 ease-out pointer-events-none opacity-0 translate-y-12">
+              <div>
+                <!-- Letter Header Stamp -->
+                <div class="flex justify-between items-start border-b border-amber-900/20 pb-3 mb-4">
+                  <div>
+                    <span class="text-[10px] tracking-widest text-amber-800 uppercase font-semibold">Special Delivery</span>
+                    <h3 id="letterTitleDisplay" class="text-xl sm:text-2xl font-['Playfair_Display'] font-bold text-amber-950">To My Dearest Heart</h3>
+                  </div>
+                  <div class="w-10 h-10 rounded-full border border-amber-900/30 flex items-center justify-center text-rose-800 text-xs font-serif">
+                    <i class="fa-solid fa-heart"></i>
+                  </div>
+                </div>
+
+                <!-- Typed Letter Body -->
+                <div id="typedLetterContainer" class="font-['Italianno'] text-2xl sm:text-3xl text-amber-950 leading-tight min-h-[140px] max-h-[190px] sm:max-h-[220px] overflow-y-auto pr-1">
+                  <span id="typedLetterContent"></span>
+                  <span id="typewriterCaret" class="cursor-blink"></span>
+                </div>
+              </div>
+
+              <!-- Bottom: Scratch-off Secret Note -->
+              <div class="pt-3 border-t border-amber-900/20 mt-2">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-[11px] font-semibold tracking-wider text-rose-900 uppercase">Secret Postscript</span>
+                  <span class="text-[10px] text-amber-800/80 italic font-serif">Rub/Scratch to reveal</span>
+                </div>
+
+                <!-- Canvas Scratchpad Container -->
+                <div class="relative w-full h-[64px] rounded-lg overflow-hidden border border-amber-900/30 bg-amber-50 shadow-inner flex items-center justify-center">
+                  <!-- Secret Underneath Text -->
+                  <p id="secretUnderneathText" class="absolute inset-0 flex items-center justify-center px-4 text-center font-['Sacramento'] text-2xl sm:text-3xl font-bold text-rose-800 select-none">
+                    You are my favorite thought every single day.
+                  </p>
+                  <!-- Foil Canvas Layer -->
+                  <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full cursor-crosshair z-10 touch-none"></canvas>
+                </div>
+              </div>
+
+              <!-- Letter Close/Fold Back Button -->
+              <div class="mt-3 flex justify-end">
+                <button id="closeLetterBtn" class="text-xs text-amber-800 hover:text-amber-950 underline font-medium tracking-wide">
+                  <i class="fa-solid fa-arrow-down mr-1"></i> Fold back into envelope
+                </button>
+              </div>
+            </div>
+
+            <!-- Envelope Left Pocket Flap -->
+            <div class="absolute bottom-0 left-0 w-0 h-0 border-l-[155px] sm:border-l-[220px] border-b-[105px] sm:border-b-[135px] border-l-[#320812] border-b-[#420a17] border-t-[105px] sm:border-t-[135px] border-t-transparent border-r-transparent rounded-bl-xl z-20 pointer-events-none"></div>
+
+            <!-- Envelope Right Pocket Flap -->
+            <div class="absolute bottom-0 right-0 w-0 h-0 border-r-[155px] sm:border-r-[220px] border-b-[105px] sm:border-b-[135px] border-r-[#320812] border-b-[#420a17] border-t-[105px] sm:border-t-[135px] border-t-transparent border-l-transparent rounded-br-xl z-20 pointer-events-none"></div>
+
+            <!-- Envelope Bottom Triangular Flap -->
+            <div class="absolute bottom-0 left-0 right-0 h-0 border-l-[155px] sm:border-l-[220px] border-r-[155px] sm:border-r-[220px] border-b-[120px] sm:border-b-[150px] border-b-[#2c050f] border-l-transparent border-r-transparent z-20 pointer-events-none"></div>
+
+            <!-- Envelope Top Flap (Opens in 3D rotateX) -->
+            <div id="envelopeTopFlap" class="preserve-3d absolute top-0 left-0 right-0 h-0 border-l-[155px] sm:border-l-[220px] border-r-[155px] sm:border-r-[220px] border-t-[125px] sm:border-t-[155px] border-t-[#540d1e] border-l-transparent border-r-transparent origin-top transition-transform duration-700 ease-in-out z-30">
+            </div>
+
+            <!-- The Clickable Wax Seal -->
+            <div class="absolute inset-0 flex items-center justify-center z-40">
+              <button id="waxSealBtn" class="wax-seal group" aria-label="Open Love Letter">
+                <div class="w-12 h-12 rounded-full border border-rose-300/40 flex items-center justify-center text-amber-200 text-lg shadow-inner">
+                  <i class="fa-solid fa-heart group-hover:scale-110 transition-transform"></i>
+                </div>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower Desk: Polaroids & Jar -->
+      <div id="lowerDeskArea" class="w-full mt-12 sm:mt-16 transition-all duration-700 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
+        
+        <!-- Polaroids Area (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col items-center lg:items-start">
+          <div class="mb-4 flex items-center justify-between w-full px-2">
+            <div>
+              <h3 class="text-lg font-['Playfair_Display'] text-amber-200 font-semibold flex items-center space-x-2">
+                <i class="fa-regular fa-images text-rose-400 text-sm"></i>
+                <span>Our Polaroid Memories</span>
+              </h3>
+              <p class="text-xs text-stone-400">Drag to arrange. Click to flip &amp; read the back.</p>
+            </div>
+            <button id="resetPolaroidsBtn" type="button" class="relative z-30 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-amber-400/30 text-xs text-amber-300 hover:text-amber-100 transition shadow-sm flex items-center space-x-1.5 cursor-pointer">
+              <i class="fa-solid fa-arrows-rotate text-[10px]" id="resetBtnIcon"></i>
+              <span>Reset desk</span>
+            </button>
+          </div>
+
+          <div id="polaroidArea" class="relative w-full h-[360px] sm:h-[420px] rounded-3xl border border-white/5 bg-white/[0.02] p-4 overflow-hidden">
+            <!-- Polaroid 1 -->
+            <div id="polaroid1" class="polaroid absolute top-6 left-4 sm:left-10 w-[180px] sm:w-[210px] select-none shadow-2xl rounded-sm">
+              <div class="polaroid-inner relative w-full h-full">
+                <div class="polaroid-front backface-hidden">
+                  <div class="w-full h-[160px] sm:h-[190px] bg-stone-900 rounded-sm overflow-hidden mb-2 relative">
+                    <img id="polaroidImg1" src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop" alt="Memory 1" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/600x600/220c15/f3d0a9?text=Our+Memory'">
+                    <div class="absolute top-1 right-2 text-stone-400/80 text-[10px] font-sans">#1</div>
+                  </div>
+                  <p id="polaroidCap1" class="text-center font-['Reenie_Beanie'] text-2xl text-stone-800 leading-tight">The night we laughed until 3am ✨</p>
+                </div>
+                <div class="polaroid-back absolute inset-0 bg-[#fffef5] p-3 text-stone-800 rounded-sm backface-hidden [transform:rotateY(180deg)] flex flex-col justify-between border border-amber-200">
+                  <div>
+                    <span class="text-[9px] uppercase tracking-wider text-rose-800 font-bold">Memory Stamped</span>
+                    <p id="polaroidBackNote1" class="font-['Reenie_Beanie'] text-2xl mt-3 text-stone-900 leading-normal">
+                      "I knew right here that you were my home. Nothing felt heavy anymore."
+                    </p>
+                  </div>
+                  <span id="polaroidDate1" class="text-right text-[11px] font-serif italic text-stone-500">October 2022</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polaroid 2 -->
+            <div id="polaroid2" class="polaroid absolute top-12 left-1/3 w-[180px] sm:w-[210px] select-none shadow-2xl rounded-sm">
+              <div class="polaroid-inner relative w-full h-full">
+                <div class="polaroid-front backface-hidden">
+                  <div class="w-full h-[160px] sm:h-[190px] bg-stone-900 rounded-sm overflow-hidden mb-2 relative">
+                    <img id="polaroidImg2" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop" alt="Memory 2" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/600x600/220c15/f3d0a9?text=Sunset+With+You'">
+                    <div class="absolute top-1 right-2 text-stone-400/80 text-[10px] font-sans">#2</div>
+                  </div>
+                  <p id="polaroidCap2" class="text-center font-['Reenie_Beanie'] text-2xl text-stone-800 leading-tight">Sunset walk by the water 🌅</p>
+                </div>
+                <div class="polaroid-back absolute inset-0 bg-[#fffef5] p-3 text-stone-800 rounded-sm backface-hidden [transform:rotateY(180deg)] flex flex-col justify-between border border-amber-200">
+                  <div>
+                    <span class="text-[9px] uppercase tracking-wider text-rose-800 font-bold">Memory Stamped</span>
+                    <p id="polaroidBackNote2" class="font-['Reenie_Beanie'] text-2xl mt-3 text-stone-900 leading-normal">
+                      "The breeze was cold, but your hand in my jacket pocket was the warmest thing on earth."
+                    </p>
+                  </div>
+                  <span id="polaroidDate2" class="text-right text-[11px] font-serif italic text-stone-500">July 2023</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polaroid 3 -->
+            <div id="polaroid3" class="polaroid absolute top-20 right-4 sm:right-12 w-[180px] sm:w-[210px] select-none shadow-2xl rounded-sm">
+              <div class="polaroid-inner relative w-full h-full">
+                <div class="polaroid-front backface-hidden">
+                  <div class="w-full h-[160px] sm:h-[190px] bg-stone-900 rounded-sm overflow-hidden mb-2 relative">
+                    <img id="polaroidImg3" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop" alt="Memory 3" class="w-full h-full object-cover pointer-events-none" onerror="this.src='https://placehold.co/600x600/220c15/f3d0a9?text=Stargazing'">
+                    <div class="absolute top-1 right-2 text-stone-400/80 text-[10px] font-sans">#3</div>
+                  </div>
+                  <p id="polaroidCap3" class="text-center font-['Reenie_Beanie'] text-2xl text-stone-800 leading-tight">Counting shooting stars 💫</p>
+                </div>
+                <div class="polaroid-back absolute inset-0 bg-[#fffef5] p-3 text-stone-800 rounded-sm backface-hidden [transform:rotateY(180deg)] flex flex-col justify-between border border-amber-200">
+                  <div>
+                    <span class="text-[9px] uppercase tracking-wider text-rose-800 font-bold">Memory Stamped</span>
+                    <p id="polaroidBackNote3" class="font-['Reenie_Beanie'] text-2xl mt-3 text-stone-900 leading-normal">
+                      "Every wish I ever made on a star came true the day you smiled at me."
+                    </p>
+                  </div>
+                  <span id="polaroidDate3" class="text-right text-[11px] font-serif italic text-stone-500">December 2023</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jar of Reasons (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col items-center">
+          <div class="mb-4 text-center lg:text-left w-full px-2">
+            <h3 class="text-lg font-['Playfair_Display'] text-amber-200 font-semibold flex items-center justify-center lg:justify-start space-x-2">
+              <i class="fa-solid fa-jar text-rose-400 text-sm"></i>
+              <span>Jar of 100 Reasons</span>
+            </h3>
+            <p class="text-xs text-stone-400">Click the glass jar to pull an origami heart reason.</p>
+          </div>
+
+          <div id="jarContainer" class="relative group cursor-pointer w-[220px] h-[300px] flex flex-col items-center justify-end p-4">
+            <div class="absolute inset-x-4 bottom-4 top-12 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition duration-500"></div>
+
+            <div class="relative z-10 w-[140px] h-[22px] bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 rounded-t-md border-t border-amber-400/50 shadow-md flex items-center justify-center">
+              <div class="w-[120px] h-[4px] bg-amber-900/40 rounded-full"></div>
+            </div>
+            <div class="relative z-10 w-[125px] h-[10px] bg-amber-950/80 border-x border-amber-600/40"></div>
+
+            <div class="relative z-10 w-[190px] h-[240px] rounded-3xl rounded-t-lg bg-gradient-to-b from-white/15 via-white/5 to-white/10 border-2 border-white/20 backdrop-blur-[4px] shadow-[inset_0_0_20px_rgba(255,255,255,0.15)] flex flex-col items-center justify-end p-4 overflow-hidden group-hover:border-amber-300/40 transition">
+              <div class="absolute top-4 left-3 w-3 h-44 rounded-full bg-gradient-to-b from-white/40 to-transparent blur-[1px]"></div>
+              <div class="absolute top-4 right-4 w-1.5 h-36 rounded-full bg-white/20 blur-[1px]"></div>
+
+              <div class="relative w-full h-[150px] flex flex-wrap items-end justify-center gap-2 p-2">
+                <i class="fa-solid fa-heart text-rose-500 text-xl transform -rotate-12 animate-pulse"></i>
+                <i class="fa-solid fa-heart text-amber-400 text-lg transform rotate-45"></i>
+                <i class="fa-solid fa-heart text-rose-400 text-2xl transform rotate-12"></i>
+                <i class="fa-solid fa-heart text-pink-400 text-sm transform -rotate-45"></i>
+                <i class="fa-solid fa-heart text-rose-600 text-xl transform rotate-6"></i>
+                <i class="fa-solid fa-heart text-amber-300 text-lg transform -rotate-18"></i>
+                <i class="fa-solid fa-heart text-red-400 text-2xl transform rotate-20"></i>
+              </div>
+
+              <div class="z-20 px-3 py-1 bg-amber-100/90 rounded border border-amber-800/30 shadow-sm text-stone-900 text-center mb-2">
+                <span class="font-['Cinzel_Decorative'] text-[9px] font-bold tracking-wider block">REASONS WHY</span>
+                <span class="text-[9px] font-serif italic text-rose-900">I Love You</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="reasonCard" class="hidden glass-card rounded-2xl p-5 border border-amber-400/30 w-full max-w-sm mt-4 text-center transform transition-all duration-500 shadow-2xl relative">
+            <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center mx-auto mb-2 text-sm">
+              <i class="fa-solid fa-heart"></i>
+            </div>
+            <span class="text-[10px] uppercase tracking-widest text-amber-300 font-semibold">Reason Drawn</span>
+            <p id="reasonText" class="font-['Playfair_Display'] italic text-lg text-rose-100 mt-2 mb-3">
+              "The gentle way you smile right before you burst into laughter."
+            </p>
+            <button id="drawAnotherReasonBtn" class="text-xs px-3 py-1.5 rounded-full bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-200 transition">
+              <i class="fa-solid fa-shuffle mr-1"></i>Draw another reason
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2: "OPEN WHEN..." VIRTUAL LETTER VAULT
+         ======================================================== -->
+    <div id="sectionOpenWhen" class="content-section hidden w-full max-w-4xl flex flex-col items-center">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl sm:text-3xl font-['Playfair_Display'] text-amber-200">The "Open When..." Sanctuary</h3>
+        <p class="text-xs sm:text-sm text-stone-400 mt-1">Letters for the exact moments you need my warmth the most.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full px-2">
+        <!-- Envelope 1: Miss Me -->
+        <div class="open-when-card glass-card rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer hover:border-amber-400/50 hover:scale-105 transition duration-300 group" data-vault="miss">
+          <div class="w-14 h-14 rounded-full bg-rose-900/40 border border-rose-400/30 flex items-center justify-center text-rose-300 text-xl mb-3 shadow-lg group-hover:scale-110 transition">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <span class="text-[10px] uppercase tracking-widest text-amber-300 font-bold">Open When...</span>
+          <h4 class="font-['Playfair_Display'] text-base font-semibold text-white mt-1">You Miss Me</h4>
+          <p class="text-[11px] text-stone-400 mt-1">For quiet evenings when distance feels heavy.</p>
+          <span class="mt-4 text-[10px] text-rose-300 underline font-medium">Break Seal &rarr;</span>
+        </div>
+
+        <!-- Envelope 2: Can't Sleep -->
+        <div class="open-when-card glass-card rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer hover:border-indigo-400/50 hover:scale-105 transition duration-300 group" data-vault="sleep">
+          <div class="w-14 h-14 rounded-full bg-indigo-900/40 border border-indigo-400/30 flex items-center justify-center text-indigo-300 text-xl mb-3 shadow-lg group-hover:scale-110 transition">
+            <i class="fa-solid fa-moon"></i>
+          </div>
+          <span class="text-[10px] uppercase tracking-widest text-indigo-300 font-bold">Open When...</span>
+          <h4 class="font-['Playfair_Display'] text-base font-semibold text-white mt-1">You Can't Sleep</h4>
+          <p class="text-[11px] text-stone-400 mt-1">A bedtime whisper when thoughts wander late.</p>
+          <span class="mt-4 text-[10px] text-indigo-300 underline font-medium">Break Seal &rarr;</span>
+        </div>
+
+        <!-- Envelope 3: Had a Bad Day -->
+        <div class="open-when-card glass-card rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer hover:border-amber-400/50 hover:scale-105 transition duration-300 group" data-vault="down">
+          <div class="w-14 h-14 rounded-full bg-amber-900/40 border border-amber-400/30 flex items-center justify-center text-amber-300 text-xl mb-3 shadow-lg group-hover:scale-110 transition">
+            <i class="fa-solid fa-cloud-sun-rain"></i>
+          </div>
+          <span class="text-[10px] uppercase tracking-widest text-amber-300 font-bold">Open When...</span>
+          <h4 class="font-['Playfair_Display'] text-base font-semibold text-white mt-1">You Feel Down</h4>
+          <p class="text-[11px] text-stone-400 mt-1">A safe shelter reminding you of your grace.</p>
+          <span class="mt-4 text-[10px] text-amber-300 underline font-medium">Break Seal &rarr;</span>
+        </div>
+
+        <!-- Envelope 4: Birthday / Special Moment -->
+        <div class="open-when-card glass-card rounded-2xl p-5 flex flex-col items-center text-center cursor-pointer hover:border-pink-400/50 hover:scale-105 transition duration-300 group" data-vault="celebrate">
+          <div class="w-14 h-14 rounded-full bg-pink-900/40 border border-pink-400/30 flex items-center justify-center text-pink-300 text-xl mb-3 shadow-lg group-hover:scale-110 transition">
+            <i class="fa-solid fa-cake-candles"></i>
+          </div>
+          <span class="text-[10px] uppercase tracking-widest text-pink-300 font-bold">Open When...</span>
+          <h4 class="font-['Playfair_Display'] text-base font-semibold text-white mt-1">We Celebrate</h4>
+          <p class="text-[11px] text-stone-400 mt-1">For birthdays, milestones, and shared victories.</p>
+          <span class="mt-4 text-[10px] text-pink-300 underline font-medium">Break Seal &rarr;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 3: LOVE LOCKS BRIDGE (Pont des Arts Paris)
+         ======================================================== -->
+    <div id="sectionLoveLock" class="content-section hidden w-full max-w-3xl flex flex-col items-center">
+      <div class="text-center mb-6">
+        <h3 class="text-2xl sm:text-3xl font-['Playfair_Display'] text-amber-200">Our Love Lock Bridge</h3>
+        <p class="text-xs sm:text-sm text-stone-400 mt-1">Engrave our initials, snap the padlock shut, and throw the key into the river forever.</p>
+      </div>
+
+      <div class="w-full glass-card rounded-3xl p-6 sm:p-8 border border-white/10 flex flex-col items-center relative overflow-hidden">
+        
+        <!-- River Water Glow Background -->
+        <div class="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-blue-950/60 to-transparent pointer-events-none"></div>
+
+        <!-- Bridge Railing Mesh SVG Background -->
+        <div class="relative w-full h-44 sm:h-52 rounded-2xl border-2 border-stone-600 bg-black/40 overflow-hidden flex items-center justify-center mb-6 shadow-inner">
+          <div class="absolute inset-0 opacity-25" style="background-image: repeating-linear-gradient(45deg, #bbb 0, #bbb 2px, transparent 0, transparent 18px), repeating-linear-gradient(-45deg, #bbb 0, #bbb 2px, transparent 0, transparent 18px);"></div>
+          
+          <!-- Locked Padlocks Displayed on the Bridge -->
+          <div id="bridgeRailingPads" class="relative z-10 flex flex-wrap gap-4 items-center justify-center px-4">
+            <!-- Default locked Padlock -->
+            <div id="mainBridgeLock" class="w-20 h-24 bg-gradient-to-b from-amber-300 to-amber-600 rounded-2xl p-2 flex flex-col items-center justify-between shadow-2xl border border-amber-200 transform hover:scale-105 transition">
+              <!-- Shackle Bar -->
+              <div id="lockShackle" class="w-10 h-8 border-4 border-stone-300 border-b-0 rounded-t-full -mt-6 bg-transparent transition-transform duration-500"></div>
+              <div class="text-center">
+                <i class="fa-solid fa-heart text-red-700 text-xs"></i>
+                <div id="bridgeInitialsDisplay" class="font-['Cinzel_Decorative'] font-bold text-stone-900 text-xs">E + L</div>
+                <div class="text-[8px] text-stone-800 font-mono">FOREVER</div>
+              </div>
+              <div class="w-2 h-3 bg-stone-900 rounded-full"></div>
+            </div>
+          </div>
+
+          <!-- Falling Key Particle Container -->
+          <div id="fallingKey" class="absolute hidden text-amber-300 text-sm z-20 pointer-events-none">
+            <i class="fa-solid fa-key"></i>
+          </div>
+        </div>
+
+        <!-- Controls: Engrave Lock -->
+        <div class="w-full max-w-md flex flex-col sm:flex-row items-center gap-3">
+          <input type="text" id="inputLockInitials" maxlength="10" placeholder="Your Initials (e.g. E + L)" class="w-full bg-black/40 border border-white/20 rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-amber-200 uppercase tracking-widest focus:outline-none focus:border-amber-400">
+          <button id="snapLockBtn" class="w-full sm:w-auto shrink-0 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-700 hover:from-amber-500 hover:to-rose-600 text-white font-semibold text-xs transition shadow-lg flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-lock"></i>
+            <span>Snap Lock &amp; Toss Key</span>
+          </button>
+        </div>
+        <p id="lockStatusMessage" class="text-xs text-amber-300/80 mt-3 italic font-serif text-center">Padlock sealed forever. The key is lost at the bottom of the river.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 4: CELESTIAL "OUR NIGHT SKY" CONSTELLATION MAP
+         ======================================================== -->
+    <div id="sectionConstellation" class="content-section hidden w-full max-w-4xl flex flex-col items-center">
+      <div class="text-center mb-4">
+        <h3 class="text-2xl sm:text-3xl font-['Playfair_Display'] text-amber-200">Our Celestial Night Sky</h3>
+        <p class="text-xs sm:text-sm text-stone-400 mt-1">Connect the stars of our journey. Click each glowing node to reveal our constellations.</p>
+      </div>
+
+      <div class="relative w-full h-[380px] sm:h-[450px] rounded-3xl border border-indigo-500/20 bg-gradient-to-b from-[#060412] to-[#0d0a21] overflow-hidden shadow-2xl">
+        <canvas id="constellationCanvas" class="w-full h-full cursor-pointer"></canvas>
+        <div id="starTooltip" class="absolute hidden z-20 glass-card px-3 py-2 rounded-xl text-xs text-amber-200 border border-amber-400/30 pointer-events-none shadow-xl">
+          <span id="starTooltipTitle" class="font-bold block text-white"></span>
+          <span id="starTooltipDate" class="text-[10px] text-stone-400"></span>
+        </div>
+        <div class="absolute bottom-3 left-4 text-[11px] text-stone-400/80 pointer-events-none">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-300 mr-1"></i>Tap nodes to form the constellation lines
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 5: "OUR PASSPORT" LOVE BUCKET LIST
+         ======================================================== -->
+    <div id="sectionPassport" class="content-section hidden w-full max-w-3xl flex flex-col items-center">
+      <div class="text-center mb-6">
+        <h3 class="text-2xl sm:text-3xl font-['Playfair_Display'] text-amber-200">Our Relationship Passport</h3>
+        <p class="text-xs sm:text-sm text-stone-400 mt-1">Our shared dreams and adventures. Tap any milestone to stamp it as accomplished!</p>
+      </div>
+
+      <div class="w-full parchment-sheet rounded-2xl p-6 sm:p-8 shadow-2xl border border-amber-900/30 text-stone-900 relative">
+        <div class="flex items-center justify-between border-b border-stone-400 pb-3 mb-5">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-passport text-amber-900 text-xl"></i>
+            <span class="font-['Cinzel_Decorative'] font-bold text-sm tracking-widest text-amber-950">OFFICIAL BUCKET LIST RECORD</span>
+          </div>
+          <span class="text-xs italic font-serif text-stone-600">Issued by: Elena &amp; Lucas</span>
+        </div>
+
+        <div id="bucketListItems" class="space-y-4">
+          <!-- Item 1 -->
+          <div class="bucket-item flex items-center justify-between p-3 rounded-xl bg-white/50 border border-stone-300 cursor-pointer hover:bg-white/80 transition" data-index="0">
+            <div class="flex items-center space-x-3">
+              <i class="fa-regular fa-square-check text-base text-rose-800"></i>
+              <span class="text-sm font-medium text-stone-800">Cook homemade pasta together from scratch at 2 AM</span>
+            </div>
+            <span class="rubber-stamp">ACCOMPLISHED</span>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="bucket-item flex items-center justify-between p-3 rounded-xl bg-white/50 border border-stone-300 cursor-pointer hover:bg-white/80 transition" data-index="1">
+            <div class="flex items-center space-x-3">
+              <i class="fa-regular fa-square-check text-base text-rose-800"></i>
+              <span class="text-sm font-medium text-stone-800">Spontaneous road trip with no destination until sunset</span>
+            </div>
+            <span class="rubber-stamp">ACCOMPLISHED</span>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="bucket-item flex items-center justify-between p-3 rounded-xl bg-white/50 border border-stone-300 cursor-pointer hover:bg-white/80 transition" data-index="2">
+            <div class="flex items-center space-x-3">
+              <i class="fa-regular fa-square text-base text-stone-500"></i>
+              <span class="text-sm font-medium text-stone-800">Witness the Northern Lights dancing in the snow together</span>
+            </div>
+            <span class="rubber-stamp hidden">ACCOMPLISHED</span>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="bucket-item flex items-center justify-between p-3 rounded-xl bg-white/50 border border-stone-300 cursor-pointer hover:bg-white/80 transition" data-index="3">
+            <div class="flex items-center space-x-3">
+              <i class="fa-regular fa-square text-base text-stone-500"></i>
+              <span class="text-sm font-medium text-stone-800">Build a massive living room blanket fort for movie night</span>
+            </div>
+            <span class="rubber-stamp hidden">ACCOMPLISHED</span>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-stone-400 flex items-center justify-between text-xs text-stone-600">
+          <span>Click any goal to stamp/unstamp it</span>
+          <span class="font-serif italic">To be continued for eternity...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 6: FINGERPRINT HEARTBEAT SENSOR
+         ======================================================== -->
+    <div id="sectionHeartbeat" class="content-section hidden w-full max-w-xl flex flex-col items-center">
+      <div class="text-center mb-6">
+        <h3 class="text-2xl sm:text-3xl font-['Playfair_Display'] text-amber-200">Biometric Heartbeat Sync</h3>
+        <p class="text-xs sm:text-sm text-stone-400 mt-1">Press and hold your thumb for 3 seconds to send a pulse of your love.</p>
+      </div>
+
+      <div class="w-full glass-card rounded-3xl p-8 border border-rose-500/20 flex flex-col items-center text-center shadow-2xl relative">
+        <!-- Pulse ring indicator -->
+        <div id="heartbeatAura" class="relative w-36 h-36 rounded-full flex items-center justify-center cursor-pointer select-none transition-all duration-300">
+          <div class="absolute inset-0 rounded-full bg-rose-600/10 border-2 border-rose-500/30 animate-pulse"></div>
+          <div id="heartbeatProgressCircle" class="absolute inset-2 rounded-full border-4 border-dashed border-rose-400/60 transition-all duration-300"></div>
+          
+          <button id="thumbprintBtn" class="w-24 h-24 rounded-full bg-gradient-to-tr from-[#380b16] to-[#6d1329] border-2 border-rose-400/60 flex items-center justify-center text-rose-300 text-4xl shadow-2xl active:scale-95 transition-transform touch-none" aria-label="Hold Thumbprint">
+            <i class="fa-solid fa-fingerprint"></i>
+          </button>
+        </div>
+
+        <div class="mt-6">
+          <span id="heartbeatLabel" class="text-xs font-semibold uppercase tracking-widest text-amber-300 block">Press &amp; Hold Thumb</span>
+          <p id="heartbeatSubtext" class="text-xs text-stone-400 mt-1">Simulates live 68 BPM cardiac sync</p>
+        </div>
+
+        <div id="heartbeatWaveform" class="w-full h-8 mt-4 flex items-center justify-center space-x-1 opacity-60">
+          <div class="w-1 h-3 bg-rose-500 rounded-full"></div>
+          <div class="w-1 h-6 bg-rose-400 rounded-full"></div>
+          <div class="w-1 h-2 bg-rose-600 rounded-full"></div>
+          <div class="w-1 h-7 bg-rose-300 rounded-full"></div>
+          <div class="w-1 h-4 bg-rose-500 rounded-full"></div>
+          <div class="w-1 h-8 bg-rose-400 rounded-full"></div>
+          <div class="w-1 h-3 bg-rose-600 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================
+       STEAMY RAINY WINDOW FOG-WIPE MODAL
+       ======================================================== -->
+  <div id="steamyWindowModal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center transition-opacity opacity-0 pointer-events-none">
+    <div class="relative w-full max-w-2xl h-[520px] rounded-3xl overflow-hidden border border-white/20 shadow-2xl mx-4 bg-[#0a0f18]">
+      
+      <!-- Hidden Underlying Romance Image & Handwritten Message -->
+      <div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center select-none">
+        <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover filter blur-[1px] brightness-75" alt="Rainy Love" onerror="this.src='https://placehold.co/800x600/100a18/f3d0a9?text=I+Love+You'">
+        <div class="relative z-10 p-6 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 max-w-md">
+          <i class="fa-solid fa-heart text-rose-500 text-3xl mb-2 animate-bounce"></i>
+          <h4 class="font-['Sacramento'] text-4xl text-amber-100 font-bold">You are my safe harbor in every storm.</h4>
+          <p class="font-serif italic text-xs text-stone-300 mt-2">No matter how hard it rains outside, with you I am always home.</p>
+        </div>
+      </div>
+
+      <!-- Condensation Fog Canvas -->
+      <canvas id="fogCanvas" class="absolute inset-0 w-full h-full cursor-pointer touch-none z-20"></canvas>
+
+      <!-- Fog Top Bar -->
+      <div class="absolute top-4 left-4 right-4 z-30 flex items-center justify-between pointer-events-auto">
+        <span class="text-xs font-mono text-stone-300 bg-black/50 px-3 py-1.5 rounded-full border border-white/10">
+          <i class="fa-solid fa-hand text-amber-300 mr-1.5"></i>Wipe the foggy window with your finger
+        </span>
+        <button id="closeSteamyWindowBtn" class="w-8 h-8 rounded-full bg-black/60 text-stone-300 hover:text-white flex items-center justify-center border border-white/15">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- "Open When" Letter Reading Modal -->
+  <div id="openWhenModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center transition-opacity opacity-0 pointer-events-none p-4">
+    <div class="parchment-sheet max-w-lg w-full p-6 sm:p-8 rounded-2xl shadow-2xl relative flex flex-col justify-between min-h-[380px] border border-amber-900/30">
+      <div>
+        <div class="flex items-center justify-between border-b border-amber-900/20 pb-3 mb-4">
+          <span class="text-[11px] tracking-widest text-amber-800 uppercase font-bold" id="vaultModalTag">OPEN WHEN YOU MISS ME</span>
+          <button id="closeVaultModalBtn" class="text-amber-900 hover:text-amber-950 p-1 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <h3 id="vaultModalTitle" class="text-2xl font-['Playfair_Display'] font-bold text-amber-950 mb-3">Close your eyes and breathe...</h3>
+        <p id="vaultModalBody" class="font-['Italianno'] text-2xl sm:text-3xl text-amber-950 leading-relaxed max-h-[220px] overflow-y-auto pr-2">
+          Whenever you miss me, remember that we are breathing the exact same air beneath the exact same stars. Wrap your arms tight around yourself; that's me holding you right now.
+        </p>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-amber-900/20 flex items-center justify-between text-xs text-amber-900">
+        <span class="font-serif italic">Always with you, heart to heart.</span>
+        <button id="vaultConfirmCloseBtn" class="px-4 py-1.5 rounded-lg bg-amber-900/20 hover:bg-amber-900/30 text-amber-950 font-medium">Seal Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ambient Vinyl Player & Soundscape Mixer Widget -->
+  <div id="vinylPlayerWidget" class="fixed bottom-5 left-5 z-40 glass-pill p-3 sm:p-4 rounded-3xl flex flex-col border border-white/10 shadow-2xl transition hover:border-amber-400/30 max-w-[340px]">
+    <div class="flex items-center space-x-3.5">
+      <!-- Mini Turntable Deck -->
+      <div class="relative w-16 h-16 sm:w-20 sm:h-20 bg-[#1e1528] rounded-2xl p-1.5 border border-white/10 shadow-inner flex items-center justify-center shrink-0">
+        <!-- The Spinning Vinyl -->
+        <div id="vinylDisc" class="w-full h-full rounded-full vinyl-grooves spin-slow spin-paused flex items-center justify-center relative">
+          <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-amber-600 to-rose-700 flex items-center justify-center border border-white/40 shadow-sm">
+            <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- Tone Arm Needle -->
+        <div class="absolute top-1 right-1 w-6 h-12 pointer-events-none">
+          <svg viewBox="0 0 40 80" class="w-full h-full">
+            <circle cx="18" cy="18" r="7" fill="#7d7d7d" stroke="#fff" stroke-width="1.5" />
+            <path id="needleArmPath" class="needle-arm" d="M18 18 L24 55 L32 65" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round" />
+            <rect x="28" y="62" width="7" height="9" rx="1.5" fill="#c0392b" />
+          </svg>
+        </div>
+        <div id="vinylPulseRing" class="absolute -inset-1 rounded-2xl border border-rose-500/30 animate-ping pointer-events-none hidden"></div>
+      </div>
+
+      <!-- Song Info & Controls -->
+      <div class="pr-2 min-w-0">
+        <div class="flex items-center space-x-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-rose-500" id="audioLed"></span>
+          <span class="text-[10px] tracking-wider uppercase text-stone-400 font-bold" id="audioSourceBadge">Lofi Romance</span>
+        </div>
+        <p id="songTitleDisplay" class="text-xs sm:text-sm font-semibold text-amber-200 truncate">Sweet Nostalgia</p>
+        <div class="flex items-center space-x-2 sm:space-x-2.5 mt-1.5">
+          <button id="dockPrevBtn" title="Previous Track" class="text-stone-400 hover:text-white transition text-xs">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+          <button id="dockPlayBtn" title="Play/Pause" class="text-stone-300 hover:text-white transition text-sm">
+            <i class="fa-solid fa-play" id="dockPlayIcon"></i>
+          </button>
+          <button id="dockNextBtn" title="Next Track" class="text-stone-400 hover:text-white transition text-xs">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+          <button id="dockChangeTrackBtn" title="Song Menu" class="text-[10px] text-amber-300 hover:text-amber-200 flex items-center space-x-1 pl-1 border-l border-white/10">
+            <i class="fa-solid fa-list-ul text-[10px]"></i>
+            <span class="hidden sm:inline">Tracks</span>
+          </button>
+          <button id="toggleSoundscapeBtn" class="text-[10px] text-amber-300 hover:text-amber-200 underline">
+            <i class="fa-solid fa-sliders mr-1"></i>Atmosphere
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Embedded YouTube Player Container -->
+    <div id="ytPlayerWrapper" class="hidden mt-2.5 pt-2.5 border-t border-white/10 w-full">
+      <div class="relative w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-black border border-rose-500/30 shadow-inner">
+        <div id="ytPlayerNode" class="w-full h-full"></div>
+      </div>
+      <p class="text-[10px] text-stone-400 mt-1 flex items-center justify-between">
+        <span class="text-rose-300"><i class="fa-brands fa-youtube mr-1"></i>YouTube Music</span>
+        <span id="ytStatusHint" class="text-stone-500 text-[9px]">Ready</span>
+      </p>
+    </div>
+
+    <!-- Embedded Spotify Container -->
+    <div id="spotifyEmbedContainer" class="hidden mt-2.5 pt-2.5 border-t border-white/10 w-full"></div>
+
+    <!-- Soundscape Mini Mixer Drawer (Rain, Fireplace, Waves) -->
+    <div id="soundscapeMixer" class="hidden pt-3 mt-3 border-t border-white/10 space-y-2 text-[11px] text-stone-300">
+      <div class="flex items-center justify-between">
+        <span class="flex items-center space-x-1.5"><i class="fa-solid fa-cloud-rain text-blue-400"></i><span>Window Rain</span></span>
+        <input type="range" id="rainVolume" min="0" max="1" step="0.05" value="0" class="w-20 accent-blue-400 h-1">
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="flex items-center space-x-1.5"><i class="fa-solid fa-fire text-amber-500"></i><span>Cozy Fire</span></span>
+        <input type="range" id="fireVolume" min="0" max="1" step="0.05" value="0" class="w-20 accent-amber-500 h-1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Personalize & Share Off-Canvas Drawer -->
+  <div id="customizeDrawerBackdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity opacity-0 pointer-events-none"></div>
+
+  <aside id="customizeDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#130e1d] border-l border-amber-500/20 z-50 shadow-2xl p-6 overflow-y-auto transform translate-x-full transition-transform duration-500 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-full bg-rose-900/50 flex items-center justify-center text-rose-300">
+            <i class="fa-solid fa-feather-pointed"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-['Playfair_Display'] font-bold text-amber-200">Customizer &amp; Share Engine</h3>
+            <p class="text-[11px] text-stone-400">Generate a unique link to send to your partner</p>
+          </div>
+        </div>
+        <button id="closeDrawerBtn" class="text-stone-400 hover:text-white p-2 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Customization Form Inputs -->
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block text-stone-300 font-medium mb-1">Couple Names (e.g. Elena &amp; Lucas)</label>
+          <input type="text" id="inputCoupleNames" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2.5 text-stone-100 focus:outline-none focus:border-amber-400 transition" placeholder="Elena & Lucas">
+        </div>
+
+        <div>
+          <label class="block text-stone-300 font-medium mb-1">Our Special Date (Milestone Counter)</label>
+          <input type="date" id="inputAnniversaryDate" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-stone-100 focus:outline-none focus:border-amber-400 transition">
+        </div>
+
+        <div>
+          <label class="block text-stone-300 font-medium mb-1">Letter Greeting / Title</label>
+          <input type="text" id="inputLetterTitle" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2.5 text-stone-100 focus:outline-none focus:border-amber-400 transition" placeholder="To My Dearest Heart">
+        </div>
+
+        <div>
+          <label class="block text-stone-300 font-medium mb-1">Letter Body Text</label>
+          <textarea id="inputLetterBody" rows="3" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-stone-100 focus:outline-none focus:border-amber-400 transition" placeholder="Write your heartfelt message here..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-rose-300 font-medium mb-1">
+            <i class="fa-solid fa-mask mr-1"></i>Secret Scratch-Off Whisper
+          </label>
+          <input type="text" id="inputSecretMessage" class="w-full bg-black/40 border border-rose-500/30 rounded-xl px-3 py-2.5 text-stone-100 focus:outline-none focus:border-rose-400 transition" placeholder="Hidden message they must scratch to reveal...">
+        </div>
+
+        <div>
+          <label class="block text-amber-300 font-medium mb-1">Love Lock Initials</label>
+          <input type="text" id="inputCustomLockInitials" maxlength="10" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-stone-100 focus:outline-none focus:border-amber-400 transition" placeholder="E + L">
+        </div>
+
+        <!-- Polaroid Photos: File Browse & URL Inputs -->
+        <div class="pt-2 border-t border-white/10 space-y-3">
+          <span class="block text-amber-200 font-semibold mb-1">Polaroid Photos (Browse Device or URL)</span>
+          
+          <!-- Polaroid 1 File + URL -->
+          <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] text-rose-300 font-medium">Polaroid #1</span>
+              <label for="filePolaroid1" class="cursor-pointer px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] text-amber-200 transition flex items-center space-x-1 border border-white/15">
+                <i class="fa-solid fa-folder-open text-[10px]"></i>
+                <span>Browse Device</span>
+              </label>
+              <input type="file" id="filePolaroid1" accept="image/*" class="hidden">
+            </div>
+            <div id="fileInfoPolaroid1" class="hidden flex items-center justify-between text-[10px] bg-rose-950/40 p-1.5 rounded-lg border border-rose-500/30">
+              <div class="flex items-center space-x-2 truncate">
+                <img id="thumbPolaroid1" class="w-6 h-6 object-cover rounded" alt="Thumb 1">
+                <span id="fileNamePolaroid1" class="truncate text-rose-200">photo1.jpg</span>
+              </div>
+              <button id="clearPolaroid1Btn" type="button" class="text-stone-400 hover:text-white px-1">✕</button>
+            </div>
+            <input type="url" id="inputPolaroidImg1" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Or paste Photo 1 Image URL">
+            <input type="text" id="inputPolaroidCap1" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Photo 1 Caption">
+          </div>
+
+          <!-- Polaroid 2 File + URL -->
+          <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] text-rose-300 font-medium">Polaroid #2</span>
+              <label for="filePolaroid2" class="cursor-pointer px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] text-amber-200 transition flex items-center space-x-1 border border-white/15">
+                <i class="fa-solid fa-folder-open text-[10px]"></i>
+                <span>Browse Device</span>
+              </label>
+              <input type="file" id="filePolaroid2" accept="image/*" class="hidden">
+            </div>
+            <div id="fileInfoPolaroid2" class="hidden flex items-center justify-between text-[10px] bg-rose-950/40 p-1.5 rounded-lg border border-rose-500/30">
+              <div class="flex items-center space-x-2 truncate">
+                <img id="thumbPolaroid2" class="w-6 h-6 object-cover rounded" alt="Thumb 2">
+                <span id="fileNamePolaroid2" class="truncate text-rose-200">photo2.jpg</span>
+              </div>
+              <button id="clearPolaroid2Btn" type="button" class="text-stone-400 hover:text-white px-1">✕</button>
+            </div>
+            <input type="url" id="inputPolaroidImg2" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Or paste Photo 2 Image URL">
+            <input type="text" id="inputPolaroidCap2" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Photo 2 Caption">
+          </div>
+
+          <!-- Polaroid 3 File + URL -->
+          <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] text-rose-300 font-medium">Polaroid #3</span>
+              <label for="filePolaroid3" class="cursor-pointer px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] text-amber-200 transition flex items-center space-x-1 border border-white/15">
+                <i class="fa-solid fa-folder-open text-[10px]"></i>
+                <span>Browse Device</span>
+              </label>
+              <input type="file" id="filePolaroid3" accept="image/*" class="hidden">
+            </div>
+            <div id="fileInfoPolaroid3" class="hidden flex items-center justify-between text-[10px] bg-rose-950/40 p-1.5 rounded-lg border border-rose-500/30">
+              <div class="flex items-center space-x-2 truncate">
+                <img id="thumbPolaroid3" class="w-6 h-6 object-cover rounded" alt="Thumb 3">
+                <span id="fileNamePolaroid3" class="truncate text-rose-200">photo3.jpg</span>
+              </div>
+              <button id="clearPolaroid3Btn" type="button" class="text-stone-400 hover:text-white px-1">✕</button>
+            </div>
+            <input type="url" id="inputPolaroidImg3" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Or paste Photo 3 Image URL">
+            <input type="text" id="inputPolaroidCap3" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-stone-200 text-[11px]" placeholder="Photo 3 Caption">
+          </div>
+        </div>
+
+        <!-- Music Customization Section -->
+        <div class="pt-2 border-t border-white/10 space-y-2">
+          <label class="block text-stone-300 font-medium">Romantic Music Settings</label>
+          
+          <div>
+            <span class="text-[10px] text-stone-400 mb-1 block">Built-in Song Preset</span>
+            <select id="presetSongSelect" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-stone-100 text-xs focus:outline-none focus:border-amber-400">
+              <option value="0">Canon d'Amour (Piano Ballad)</option>
+              <option value="1">Midnight Reverie (Lo-Fi Jazz)</option>
+              <option value="2">Golden Hour Serenade (Music Box)</option>
+              <option value="3">Starlight Waltz (Classical)</option>
+              <option value="custom">Use Custom Audio / MP3 below</option>
+            </select>
+          </div>
+
+          <div>
+            <span class="text-[10px] text-stone-400 mb-1 block">Or Upload Local MP3 from Device</span>
+            <label for="fileLocalAudio" class="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 border border-dashed border-amber-400/40 text-amber-200 transition flex items-center justify-center space-x-2 text-xs cursor-pointer">
+              <i class="fa-solid fa-file-audio"></i>
+              <span>Choose Audio File from Device</span>
+            </label>
+            <input type="file" id="fileLocalAudio" accept="audio/*" class="hidden">
+
+            <div id="localAudioStatusBox" class="hidden mt-2 p-2 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-center justify-between">
+              <div class="flex items-center space-x-2 truncate text-xs text-rose-200">
+                <i class="fa-solid fa-music text-amber-300"></i>
+                <span id="localAudioFileName" class="truncate">song.mp3</span>
+              </div>
+              <button id="removeLocalAudioBtn" type="button" class="text-xs text-stone-400 hover:text-white px-1">✕</button>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[10px] text-stone-400 mb-1 block">Or Paste Online MP3 / Audio Stream URL</span>
+            <input type="url" id="inputCustomAudio" class="w-full bg-black/40 border border-white/15 rounded-xl px-3 py-2 text-stone-100 text-[11px]" placeholder="https://example.com/song.mp3">
+            <p id="audioDetectHintText" class="text-[10px] text-stone-400 mt-1">Leave empty for built-in romantic lo-fi chords</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Footer Actions -->
+    <div class="pt-6 border-t border-white/10 mt-6 space-y-2">
+      <button id="applyChangesBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 font-semibold text-white shadow-lg text-xs transition flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-check"></i>
+        <span>Apply Changes Preview</span>
+      </button>
+
+      <button id="copyShareLinkBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-rose-700 to-crimson-deep hover:from-rose-600 hover:to-rose-800 font-semibold text-white shadow-xl text-xs transition flex items-center justify-center space-x-2 border border-rose-400/30">
+        <i class="fa-solid fa-link"></i>
+        <span>Copy Shareable Romance Link</span>
+      </button>
+      <p class="text-[10px] text-center text-stone-400">Encodes your full custom keepsake in the link. No database needed!</p>
+    </div>
+  </aside>
+
+  <!-- Custom Floating Toast Notification -->
+  <div id="customToast" class="fixed bottom-8 right-8 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none glass-card px-4 py-3 rounded-2xl flex items-center space-x-3 border border-rose-500/40 shadow-2xl">
+    <div class="w-7 h-7 rounded-full bg-rose-500 flex items-center justify-center text-white text-xs">
+      <i class="fa-solid fa-heart" id="toastIcon"></i>
+    </div>
+    <div>
+      <h4 id="toastTitle" class="text-xs font-semibold text-amber-200">Keepsake Copied!</h4>
+      <p id="toastMessage" class="text-[11px] text-stone-300">Shareable link ready to send to your love.</p>
+    </div>
+  </div>
+
+  <audio id="externalAudio" preload="none" loop></audio>
+
+  <script>
+    /* ==========================================================
+       1. DATA STATE & URL ENCODING ENGINE
+       ========================================================== */
+    const DEFAULT_DATA = {
+      names: "Elena & Lucas",
+      anniversary: "2022-10-14",
+      letterTitle: "To My Dearest Heart",
+      letterBody: "From the very first conversation we shared under the amber streetlights, my world shifted on its axis. You make ordinary moments feel poetic, your laugh is my sanctuary, and every tomorrow with you is a gift I will never stop cherishing. Happy anniversary, my love.",
+      secretNote: "P.S. I fell in love with you on our third date in the rain.",
+      lockInitials: "E + L",
+      polaroids: [
+        {
+          img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop",
+          cap: "The night we laughed until 3am ✨",
+          note: "I knew right here that you were my home. Nothing felt heavy anymore.",
+          date: "October 2022"
+        },
+        {
+          img: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop",
+          cap: "Sunset walk by the water 🌅",
+          note: "The breeze was cold, but your hand in my jacket pocket was the warmest thing on earth.",
+          date: "July 2023"
+        },
+        {
+          img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop",
+          cap: "Counting shooting stars 💫",
+          note: "Every wish I ever made on a star came true the day you smiled at me.",
+          date: "December 2023"
+        }
+      ],
+      audioUrl: ""
+    };
+
+    let appState = { ...DEFAULT_DATA };
+
+    const REASONS_LIST = [
+      "The gentle way you smile right before you burst into laughter.",
+      "How safe and quiet the entire world feels when you hold my hand.",
+      "Your compassion for animals, strangers, and little delicate things.",
+      "The warm scent of your hair when we lean in for a hug.",
+      "How you always remember the tiniest details I mention in passing.",
+      "The silly faces you make across the room when no one else is looking.",
+      "How patient you are with me even on my toughest days.",
+      "The sparkle in your eyes whenever you talk about your passions.",
+      "Because every song about love suddenly made sense the moment I met you.",
+      "How you make ordinary supermarket runs feel like grand adventures."
+    ];
+
+    const VAULT_LETTERS = {
+      miss: {
+        tag: "OPEN WHEN YOU MISS ME",
+        title: "Close your eyes and breathe...",
+        body: "Whenever distance feels cold or the hours stretch long, close your eyes and place your right hand on your left shoulder. That is where I belong, holding you. Miles are nothing compared to the eternity we share."
+      },
+      sleep: {
+        tag: "OPEN WHEN YOU CAN'T SLEEP",
+        title: "Rest your sweet thoughts, my love...",
+        body: "Late night thoughts can feel overwhelming, but you are never alone in the dark. Imagine my fingers gently brushing through your hair, whispering that tomorrow is full of grace. Sleep softly tonight."
+      },
+      down: {
+        tag: "OPEN WHEN YOU FEEL DOWN",
+        title: "You are the strongest, purest soul...",
+        body: "The world can be noisy and tough, but nothing can dim your light. I believe in you when you struggle to believe in yourself. Drink some water, rest your shoulders, and remember that I am forever in your corner."
+      },
+      celebrate: {
+        tag: "OPEN WHEN WE CELEBRATE",
+        title: "To our happiness and triumphs!",
+        body: "Look how far we have walked hand in hand! Every victory of yours is a festival in my heart. Today we cheer, dance in the living room, and celebrate the incredible human you are."
+      }
+    };
+
+    function loadStateFromUrl() {
+      try {
+        if (window.location.hash && window.location.hash.startsWith('#keepsake=')) {
+          const encoded = window.location.hash.replace('#keepsake=', '');
+          const jsonString = decodeURIComponent(escape(atob(encoded)));
+          const parsed = JSON.parse(jsonString);
+          appState = { ...DEFAULT_DATA, ...parsed };
+        }
+      } catch (err) {
+        console.warn("Could not decode state from URL hash, falling back to defaults.", err);
+      }
+    }
+
+    function syncStateToUI() {
+      document.getElementById('coupleNamesDisplay').innerText = appState.names;
+      document.getElementById('letterTitleDisplay').innerText = appState.letterTitle;
+      document.getElementById('secretUnderneathText').innerText = appState.secretNote;
+      document.getElementById('bridgeInitialsDisplay').innerText = appState.lockInitials || "E + L";
+
+      document.getElementById('inputCoupleNames').value = appState.names;
+      document.getElementById('inputAnniversaryDate').value = appState.anniversary;
+      document.getElementById('inputLetterTitle').value = appState.letterTitle;
+      document.getElementById('inputLetterBody').value = appState.letterBody;
+      document.getElementById('inputSecretMessage').value = appState.secretNote;
+      document.getElementById('inputCustomLockInitials').value = appState.lockInitials || "E + L";
+      document.getElementById('inputLockInitials').value = appState.lockInitials || "E + L";
+      document.getElementById('inputCustomAudio').value = appState.audioUrl || "";
+
+      // Refresh Audio metadata badge & detection label
+      refreshAudioSourceInfo();
+      const inputCustomAudioEl = document.getElementById('inputCustomAudio');
+      if (inputCustomAudioEl) {
+        inputCustomAudioEl.dispatchEvent(new Event('input'));
+      }
+
+      if (appState.polaroids && appState.polaroids.length >= 3) {
+        document.getElementById('polaroidImg1').src = appState.polaroids[0].img;
+        document.getElementById('polaroidCap1').innerText = appState.polaroids[0].cap;
+        document.getElementById('inputPolaroidImg1').value = appState.polaroids[0].img;
+        document.getElementById('inputPolaroidCap1').value = appState.polaroids[0].cap;
+
+        document.getElementById('polaroidImg2').src = appState.polaroids[1].img;
+        document.getElementById('polaroidCap2').innerText = appState.polaroids[1].cap;
+        document.getElementById('inputPolaroidImg2').value = appState.polaroids[1].img;
+        document.getElementById('inputPolaroidCap2').value = appState.polaroids[1].cap;
+
+        document.getElementById('polaroidImg3').src = appState.polaroids[2].img;
+        document.getElementById('polaroidCap3').innerText = appState.polaroids[2].cap;
+        document.getElementById('inputPolaroidImg3').value = appState.polaroids[2].img;
+        document.getElementById('inputPolaroidCap3').value = appState.polaroids[2].cap;
+      }
+
+      const d = new Date(appState.anniversary);
+      if (!isNaN(d.getTime())) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        document.getElementById('anniversaryDateDisplay').innerText = `Since ${d.toLocaleDateString(undefined, options)}`;
+      }
+    }
+
+    /* ==========================================================
+       2. RELATIONSHIP MILESTONES LIVE COUNTER
+       ========================================================== */
+    function updateLoveCounter() {
+      const start = new Date(appState.anniversary).getTime();
+      const now = new Date().getTime();
+      let diff = Math.max(0, now - start);
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff -= days * (1000 * 60 * 60 * 24);
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff -= hours * (1000 * 60 * 60);
+
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff -= minutes * (1000 * 60);
+
+      const seconds = Math.floor(diff / 1000);
+
+      document.getElementById('counterDays').innerText = days;
+      document.getElementById('counterHours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('counterMinutes').innerText = String(minutes).padStart(2, '0');
+      document.getElementById('counterSeconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    /* ==========================================================
+       3. NAVIGATION TAB SWITCHING
+       ========================================================== */
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    navTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        navTabs.forEach(t => {
+          t.classList.remove('active', 'bg-white/10', 'text-amber-200');
+          t.classList.add('text-stone-300');
+        });
+        tab.classList.add('active', 'bg-white/10', 'text-amber-200');
+        tab.classList.remove('text-stone-300');
+
+        const targetId = tab.dataset.section;
+        contentSections.forEach(sec => {
+          if (sec.id === targetId) {
+            sec.classList.remove('hidden');
+            gsap.fromTo(sec, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4 });
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+
+        if (targetId === 'sectionConstellation') {
+          setTimeout(initConstellations, 100);
+        }
+      });
+    });
+
+    /* ==========================================================
+       4. AMBIENT CANVAS FIREFLIES
+       ========================================================== */
+    const canvas = document.getElementById('ambientCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const mouse = { x: -1000, y: -1000, radius: 100 };
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    class Firefly {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.5 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.7;
+        this.speedY = (Math.random() - 0.5) * 0.7 - 0.2;
+        this.alpha = Math.random() * 0.6 + 0.2;
+        this.alphaChange = (Math.random() - 0.5) * 0.015;
+        this.hue = Math.random() > 0.4 ? 42 : 350;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha += this.alphaChange;
+        if (this.alpha <= 0.1 || this.alpha >= 0.8) this.alphaChange = -this.alphaChange;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+
+        const dx = this.x - mouse.x;
+        const dy = this.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouse.radius) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          this.x += (dx / dist) * force * 3;
+          this.y += (dy / dist) * force * 3;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+        if (this.hue === 42) {
+          gradient.addColorStop(0, `rgba(255, 230, 140, ${this.alpha})`);
+          gradient.addColorStop(1, `rgba(255, 180, 50, 0)`);
+        } else {
+          gradient.addColorStop(0, `rgba(255, 160, 180, ${this.alpha})`);
+          gradient.addColorStop(1, `rgba(220, 50, 80, 0)`);
+        }
+        ctx.fillStyle = gradient;
+        ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initFireflies() {
+      particles = [];
+      const count = Math.min(window.innerWidth < 640 ? 40 : 80, 100);
+      for (let i = 0; i < count; i++) particles.push(new Firefly());
+    }
+    initFireflies();
+
+    function renderCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of particles) {
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(renderCanvas);
+    }
+    renderCanvas();
+
+    /* ==========================================================
+       5. UNIVERSAL AUDIO ENGINE (YOUTUBE, SPOTIFY, MP3 & LO-FI SYNTH)
+       ========================================================== */
+    let audioCtx = null;
+    let isPlaying = false;
+    let lofiTimer = null;
+    let rainNode = null;
+    let rainGain = null;
+    let fireInterval = null;
+
+    let localAudioBlobUrl = null;
+    let localAudioTitle = "";
+    let currentParsedAudio = { type: 'synth' };
+
+    // Romantic Built-in Track Catalog
+    const ROMANTIC_PLAYLIST = [
+      {
+        id: "canon",
+        title: "Canon d'Amour",
+        style: "Piano Ballad",
+        tempo: 3600,
+        chords: [
+          [261.63, 329.63, 392.00, 523.25], // C
+          [196.00, 246.94, 293.66, 392.00], // G
+          [220.00, 261.63, 329.63, 440.00], // Am
+          [164.81, 207.65, 246.94, 329.63], // Em
+          [174.61, 220.00, 261.63, 349.23], // F
+          [130.81, 164.81, 196.00, 261.63], // C/E
+          [174.61, 220.00, 261.63, 349.23], // F
+          [196.00, 246.94, 293.66, 392.00]  // G
+        ]
+      },
+      {
+        id: "reverie",
+        title: "Midnight Reverie",
+        style: "Lo-Fi Jazz Chords",
+        tempo: 3200,
+        chords: [
+          [174.61, 220.00, 261.63, 329.63, 392.00], // Fmaj9
+          [164.81, 196.00, 246.94, 293.66],        // Em7
+          [146.83, 174.61, 220.00, 261.63, 329.63], // Dm9
+          [130.81, 164.81, 196.00, 246.94, 261.63]  // Cmaj7
+        ]
+      },
+      {
+        id: "golden",
+        title: "Golden Hour Serenade",
+        style: "Acoustic Music Box",
+        tempo: 2800,
+        chords: [
+          [261.63, 329.63, 523.25, 659.25], // C High
+          [220.00, 329.63, 440.00, 523.25], // Am
+          [174.61, 261.63, 349.23, 523.25], // F
+          [196.00, 293.66, 392.00, 587.33]  // G
+        ]
+      },
+      {
+        id: "starlight",
+        title: "Starlight Waltz",
+        style: "Soft Classical Waltz",
+        tempo: 3400,
+        chords: [
+          [220.00, 261.63, 329.63, 440.00], // Am
+          [146.83, 174.61, 220.00, 293.66], // Dm
+          [196.00, 246.94, 293.66, 392.00], // G
+          [261.63, 329.63, 392.00, 523.25]  // C
+        ]
+      }
+    ];
+
+    let currentTrackIndex = 0;
+    let chordIdx = 0;
+
+    function renderTrackDropdown() {
+      const container = document.getElementById('trackListOptions');
+      if (!container) return;
+      container.innerHTML = '';
+
+      ROMANTIC_PLAYLIST.forEach((track, idx) => {
+        const isSelected = !localAudioBlobUrl && (!appState.audioUrl || appState.audioUrl.trim() === '') && currentTrackIndex === idx;
+        const item = document.createElement('button');
+        item.className = `w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-left transition ${
+          isSelected ? 'bg-amber-500/20 text-amber-200 border border-amber-400/40' : 'hover:bg-white/10 text-stone-300'
+        }`;
+        item.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid ${isSelected ? 'fa-volume-high text-rose-400 animate-pulse' : 'fa-music text-stone-500'}"></i>
+            <div>
+              <div class="font-medium text-xs ${isSelected ? 'text-amber-200' : 'text-stone-200'}">${track.title}</div>
+              <div class="text-[10px] text-stone-400">${track.style}</div>
+            </div>
+          </div>
+          ${isSelected ? '<i class="fa-solid fa-check text-xs text-amber-300"></i>' : ''}
+        `;
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectTrack(idx);
+          document.getElementById('quickTrackDropdown').classList.add('hidden');
+        });
+        container.appendChild(item);
+      });
+
+      if (localAudioBlobUrl) {
+        const localItem = document.createElement('div');
+        localItem.className = 'w-full px-2.5 py-2 rounded-xl bg-rose-500/20 text-rose-200 border border-rose-400/40 flex items-center justify-between text-xs';
+        localItem.innerHTML = `
+          <div class="flex items-center space-x-2 truncate">
+            <i class="fa-solid fa-file-audio text-amber-300"></i>
+            <span class="truncate">${localAudioTitle || "Local MP3"}</span>
+          </div>
+          <span class="text-[9px] bg-rose-950/80 px-1.5 py-0.5 rounded text-rose-300 uppercase">Device File</span>
+        `;
+        container.prepend(localItem);
+      }
+    }
+
+    function selectTrack(idx) {
+      if (localAudioBlobUrl) {
+        URL.revokeObjectURL(localAudioBlobUrl);
+        localAudioBlobUrl = null;
+        localAudioTitle = "";
+      }
+      appState.audioUrl = "";
+      currentTrackIndex = (idx + ROMANTIC_PLAYLIST.length) % ROMANTIC_PLAYLIST.length;
+      chordIdx = 0;
+
+      const track = ROMANTIC_PLAYLIST[currentTrackIndex];
+      refreshAudioSourceInfo();
+
+      if (isPlaying) {
+        stopSynthLoop();
+        startSynthLoop();
+      } else {
+        togglePlayback();
+      }
+
+      showToast("Track Changed", `Now playing "${track.title}" (${track.style})`);
+      renderTrackDropdown();
+    }
+
+    function nextTrack() {
+      selectTrack(currentTrackIndex + 1);
+    }
+
+    function prevTrack() {
+      selectTrack(currentTrackIndex - 1);
+    }
+
+    // Toggle Dropdown Menu
+    const openTrackMenuBtn = document.getElementById('openTrackMenuBtn');
+    const quickTrackDropdown = document.getElementById('quickTrackDropdown');
+    const dockChangeTrackBtn = document.getElementById('dockChangeTrackBtn');
+
+    if (openTrackMenuBtn && quickTrackDropdown) {
+      openTrackMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        quickTrackDropdown.classList.toggle('hidden');
+        renderTrackDropdown();
+      });
+    }
+
+    if (dockChangeTrackBtn && quickTrackDropdown) {
+      dockChangeTrackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        quickTrackDropdown.classList.toggle('hidden');
+        renderTrackDropdown();
+      });
+    }
+
+    window.addEventListener('click', (e) => {
+      if (quickTrackDropdown && !quickTrackDropdown.contains(e.target) && e.target !== openTrackMenuBtn && e.target !== dockChangeTrackBtn) {
+        quickTrackDropdown.classList.add('hidden');
+      }
+    });
+
+    // Header and Dock skip buttons
+    document.getElementById('headerPrevTrackBtn')?.addEventListener('click', (e) => { e.stopPropagation(); prevTrack(); });
+    document.getElementById('headerNextTrackBtn')?.addEventListener('click', (e) => { e.stopPropagation(); nextTrack(); });
+    document.getElementById('dockPrevBtn')?.addEventListener('click', (e) => { e.stopPropagation(); prevTrack(); });
+    document.getElementById('dockNextBtn')?.addEventListener('click', (e) => { e.stopPropagation(); nextTrack(); });
+
+    // Header Quick Upload MP3
+    document.getElementById('headerUploadMp3')?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (localAudioBlobUrl) URL.revokeObjectURL(localAudioBlobUrl);
+      localAudioBlobUrl = URL.createObjectURL(file);
+      localAudioTitle = file.name;
+      appState.audioUrl = "";
+
+      quickTrackDropdown?.classList.add('hidden');
+      refreshAudioSourceInfo();
+      if (!isPlaying) togglePlayback();
+      showToast("MP3 Loaded!", `Now playing "${file.name}"`);
+      renderTrackDropdown();
+    });
+
+    function parseAudioUrlType(url) {
+      if (localAudioBlobUrl) {
+        return { type: 'local', url: localAudioBlobUrl, title: localAudioTitle || 'Uploaded MP3' };
+      }
+      if (!url || typeof url !== 'string' || url.trim() === '') {
+        const t = ROMANTIC_PLAYLIST[currentTrackIndex] || ROMANTIC_PLAYLIST[0];
+        return { type: 'synth', url: '', title: t.title, style: t.style };
+      }
+      const trimmed = url.trim();
+
+      // Check Spotify pattern
+      const spotifyRegex = /open\.spotify\.com\/(track|album|playlist|episode)\/([a-zA-Z0-9]+)/i;
+      const spotifyMatch = trimmed.match(spotifyRegex);
+      if (spotifyMatch && spotifyMatch[1] && spotifyMatch[2]) {
+        return {
+          type: 'spotify',
+          mediaType: spotifyMatch[1],
+          id: spotifyMatch[2],
+          embedUrl: `https://open.spotify.com/embed/${spotifyMatch[1]}/${spotifyMatch[2]}?utm_source=generator&theme=0`,
+          url: trimmed,
+          title: "Spotify Track"
+        };
+      }
+
+      // Default to direct audio URL (MP3/stream)
+      return { type: 'direct', url: trimmed, title: "Special Melody" };
+    }
+
+    function refreshAudioSourceInfo() {
+      currentParsedAudio = parseAudioUrlType(appState.audioUrl);
+      const audioSourceBadge = document.getElementById('audioSourceBadge');
+      const songTitleDisplay = document.getElementById('songTitleDisplay');
+      const audioBtnText = document.getElementById('audioBtnText');
+      const spotifyContainer = document.getElementById('spotifyEmbedContainer');
+      const externalAudio = document.getElementById('externalAudio');
+
+      stopSynthLoop();
+      if (externalAudio) externalAudio.pause();
+
+      const displayTitle = currentParsedAudio.title || "Sweet Nostalgia";
+      if (songTitleDisplay) songTitleDisplay.innerText = displayTitle;
+      if (audioBtnText) audioBtnText.innerText = isPlaying ? `Playing: ${displayTitle}` : displayTitle;
+
+      if (currentParsedAudio.type === 'local') {
+        if (audioSourceBadge) audioSourceBadge.innerText = 'Device MP3';
+        if (spotifyContainer) { spotifyContainer.innerHTML = ''; spotifyContainer.classList.add('hidden'); }
+        if (externalAudio) externalAudio.src = currentParsedAudio.url;
+      } else if (currentParsedAudio.type === 'spotify') {
+        if (audioSourceBadge) audioSourceBadge.innerText = 'Spotify Track';
+        if (spotifyContainer) {
+          spotifyContainer.classList.remove('hidden');
+          spotifyContainer.innerHTML = `
+            <iframe style="border-radius:12px;" src="${currentParsedAudio.embedUrl}" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          `;
+        }
+      } else if (currentParsedAudio.type === 'direct') {
+        if (audioSourceBadge) audioSourceBadge.innerText = 'Custom Stream';
+        if (spotifyContainer) { spotifyContainer.innerHTML = ''; spotifyContainer.classList.add('hidden'); }
+        if (externalAudio) externalAudio.src = currentParsedAudio.url;
+      } else {
+        if (audioSourceBadge) audioSourceBadge.innerText = currentParsedAudio.style || 'Lofi Romance';
+        if (spotifyContainer) { spotifyContainer.innerHTML = ''; spotifyContainer.classList.add('hidden'); }
+      }
+
+      renderTrackDropdown();
+    }
+
+    // Local Device MP3 / Audio File Input
+    const fileLocalAudio = document.getElementById('fileLocalAudio');
+    const localAudioStatusBox = document.getElementById('localAudioStatusBox');
+    const localAudioFileName = document.getElementById('localAudioFileName');
+    const removeLocalAudioBtn = document.getElementById('removeLocalAudioBtn');
+
+    if (fileLocalAudio) {
+      fileLocalAudio.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (localAudioBlobUrl) {
+          URL.revokeObjectURL(localAudioBlobUrl);
+        }
+
+        localAudioBlobUrl = URL.createObjectURL(file);
+        localAudioTitle = file.name;
+
+        if (localAudioStatusBox) localAudioStatusBox.classList.remove('hidden');
+        if (localAudioFileName) localAudioFileName.innerText = file.name;
+
+        const inputCustomAudioEl = document.getElementById('inputCustomAudio');
+        if (inputCustomAudioEl) inputCustomAudioEl.value = "";
+
+        refreshAudioSourceInfo();
+        showToast("Audio Ready!", `Loaded "${file.name}" from your device.`);
+      });
+    }
+
+    if (removeLocalAudioBtn) {
+      removeLocalAudioBtn.addEventListener('click', () => {
+        if (localAudioBlobUrl) {
+          URL.revokeObjectURL(localAudioBlobUrl);
+          localAudioBlobUrl = null;
+          localAudioTitle = "";
+        }
+        if (fileLocalAudio) fileLocalAudio.value = "";
+        if (localAudioStatusBox) localAudioStatusBox.classList.add('hidden');
+        refreshAudioSourceInfo();
+        showToast("Audio Cleared", "Switched back to default romantic lo-fi chords.");
+      });
+    }
+
+    const inputCustomAudioEl = document.getElementById('inputCustomAudio');
+    if (inputCustomAudioEl) {
+      inputCustomAudioEl.addEventListener('input', (e) => {
+        const hintText = document.getElementById('audioDetectHintText');
+        if (!hintText) return;
+        const val = e.target.value.trim();
+        if (val) {
+          // If typing URL, clear uploaded device audio
+          if (localAudioBlobUrl) {
+            URL.revokeObjectURL(localAudioBlobUrl);
+            localAudioBlobUrl = null;
+            localAudioTitle = "";
+            if (localAudioStatusBox) localAudioStatusBox.classList.add('hidden');
+            if (fileLocalAudio) fileLocalAudio.value = "";
+          }
+          if (val.includes('spotify.com')) {
+            hintText.innerHTML = `<span class="text-emerald-400 font-semibold"><i class="fa-brands fa-spotify mr-1"></i>Spotify track detected</span>`;
+          } else {
+            hintText.innerHTML = `<span class="text-amber-300 font-semibold"><i class="fa-solid fa-music mr-1"></i>Online audio stream/MP3 detected</span>`;
+          }
+        } else {
+          hintText.innerText = 'Leave empty for built-in romantic lo-fi chords';
+        }
+      });
+    }
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playWarmChord(frequencies) {
+      if (!audioCtx || !isPlaying) return;
+
+      frequencies.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.type = i === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(450 + i * 80, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.8);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 4.0);
+      });
+    }
+
+    function togglePlayback() {
+      initAudioContext();
+      const parsed = parseAudioUrlType(appState.audioUrl);
+
+      if (parsed.type === 'spotify') {
+        isPlaying = !isPlaying;
+        setVinylPlayingUI(isPlaying);
+        showToast("Spotify Track", "Press play on the Spotify player widget below to listen together.");
+        return;
+      }
+
+      if (parsed.type === 'local' || parsed.type === 'direct') {
+        const externalAudio = document.getElementById('externalAudio');
+        if (!externalAudio) return;
+        if (externalAudio.src !== parsed.url) {
+          externalAudio.src = parsed.url;
+        }
+
+        if (isPlaying) {
+          externalAudio.pause();
+          isPlaying = false;
+          setVinylPlayingUI(false);
+        } else {
+          externalAudio.play().then(() => {
+            isPlaying = true;
+            setVinylPlayingUI(true);
+          }).catch((err) => {
+            console.warn("Audio element autoplay restricted, starting synth:", err);
+            startSynthLoop();
+          });
+        }
+        return;
+      }
+
+      // Procedural Synth Fallback
+      if (isPlaying) {
+        stopSynthLoop();
+      } else {
+        startSynthLoop();
+      }
+    }
+
+    // Attach playback end handler to external audio
+    const extAudioEl = document.getElementById('externalAudio');
+    if (extAudioEl) {
+      extAudioEl.addEventListener('play', () => { isPlaying = true; setVinylPlayingUI(true); });
+      extAudioEl.addEventListener('pause', () => { isPlaying = false; setVinylPlayingUI(false); });
+      extAudioEl.addEventListener('ended', () => { isPlaying = false; setVinylPlayingUI(false); });
+    }
+
+    function startSynthLoop() {
+      isPlaying = true;
+      setVinylPlayingUI(true);
+      const track = ROMANTIC_PLAYLIST[currentTrackIndex] || ROMANTIC_PLAYLIST[0];
+      const chords = track.chords;
+
+      playWarmChord(chords[chordIdx]);
+      chordIdx = (chordIdx + 1) % chords.length;
+
+      if (lofiTimer) clearInterval(lofiTimer);
+      lofiTimer = setInterval(() => {
+        const curTrack = ROMANTIC_PLAYLIST[currentTrackIndex] || ROMANTIC_PLAYLIST[0];
+        const curChords = curTrack.chords;
+        playWarmChord(curChords[chordIdx]);
+        chordIdx = (chordIdx + 1) % curChords.length;
+      }, track.tempo || 3500);
+    }
+
+    function stopSynthLoop() {
+      isPlaying = false;
+      if (lofiTimer) clearInterval(lofiTimer);
+      setVinylPlayingUI(false);
+    }
+
+    function setVinylPlayingUI(playing) {
+      const vinylDisc = document.getElementById('vinylDisc');
+      const needleArm = document.getElementById('needleArmPath');
+      const pulseRing = document.getElementById('vinylPulseRing');
+      const audioIcon = document.getElementById('audioIcon');
+      const audioBtnText = document.getElementById('audioBtnText');
+      const dockPlayIcon = document.getElementById('dockPlayIcon');
+      const audioLed = document.getElementById('audioLed');
+
+      const songTitle = currentParsedAudio?.title || ROMANTIC_PLAYLIST[currentTrackIndex]?.title || "Sweet Nostalgia";
+
+      if (playing) {
+        if (vinylDisc) vinylDisc.classList.remove('spin-paused');
+        if (needleArm) needleArm.classList.add('playing');
+        if (pulseRing) pulseRing.classList.remove('hidden');
+        if (audioIcon) audioIcon.classList.add('animate-spin');
+        if (audioBtnText) audioBtnText.innerText = songTitle;
+        if (dockPlayIcon) {
+          dockPlayIcon.classList.remove('fa-play');
+          dockPlayIcon.classList.add('fa-pause');
+        }
+        if (audioLed) audioLed.classList.add('animate-ping');
+      } else {
+        if (vinylDisc) vinylDisc.classList.add('spin-paused');
+        if (needleArm) needleArm.classList.remove('playing');
+        if (pulseRing) pulseRing.classList.add('hidden');
+        if (audioIcon) audioIcon.classList.remove('animate-spin');
+        if (audioBtnText) audioBtnText.innerText = "Paused";
+        if (dockPlayIcon) {
+          dockPlayIcon.classList.remove('fa-pause');
+          dockPlayIcon.classList.add('fa-play');
+        }
+        if (audioLed) audioLed.classList.remove('animate-ping');
+      }
+    }
+
+    document.getElementById('audioToggleBtn').addEventListener('click', togglePlayback);
+    document.getElementById('dockPlayBtn').addEventListener('click', togglePlayback);
+
+    // Soundscape mixer toggle & volume nodes
+    document.getElementById('toggleSoundscapeBtn').addEventListener('click', () => {
+      document.getElementById('soundscapeMixer').classList.toggle('hidden');
+    });
+
+    function setupRainNoise() {
+      if (!audioCtx) initAudioContext();
+      if (rainNode) return;
+
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+
+      rainGain = audioCtx.createGain();
+      rainGain.gain.setValueAtTime(0, audioCtx.currentTime);
+
+      whiteNoise.connect(filter);
+      filter.connect(rainGain);
+      rainGain.connect(audioCtx.destination);
+      whiteNoise.start();
+      rainNode = whiteNoise;
+    }
+
+    document.getElementById('rainVolume').addEventListener('input', (e) => {
+      initAudioContext();
+      setupRainNoise();
+      if (rainGain) rainGain.gain.setValueAtTime(parseFloat(e.target.value) * 0.15, audioCtx.currentTime);
+    });
+
+    document.getElementById('fireVolume').addEventListener('input', (e) => {
+      initAudioContext();
+      const vol = parseFloat(e.target.value);
+      if (fireInterval) clearInterval(fireInterval);
+      if (vol > 0) {
+        fireInterval = setInterval(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(Math.random() * 200 + 80, audioCtx.currentTime);
+          gain.gain.setValueAtTime(vol * 0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.05);
+        }, 120);
+      }
+    });
+
+    /* ==========================================================
+       6. 3D ENVELOPE, WAX SEAL & TYPEWRITER ENGINE
+       ========================================================== */
+    let isEnvelopeOpen = false;
+    let typewriterTimeout = null;
+
+    const waxSealBtn = document.getElementById('waxSealBtn');
+    const envelopeWrapper = document.getElementById('envelopeWrapper');
+    const envelopeTopFlap = document.getElementById('envelopeTopFlap');
+    const parchmentLetter = document.getElementById('parchmentLetter');
+    const envelopePrompt = document.getElementById('envelopePrompt');
+    const typedLetterContent = document.getElementById('typedLetterContent');
+    const closeLetterBtn = document.getElementById('closeLetterBtn');
+
+    function openEnvelope() {
+      if (isEnvelopeOpen) return;
+      isEnvelopeOpen = true;
+
+      // Expand envelope wrapper margin so the letter never overlaps the Polaroid heading below
+      if (envelopeWrapper) {
+        envelopeWrapper.classList.add('opened');
+      }
+
+      const rect = waxSealBtn.getBoundingClientRect();
+      const originX = (rect.left + rect.width / 2) / window.innerWidth;
+      const originY = (rect.top + rect.height / 2) / window.innerHeight;
+      confetti({
+        particleCount: 45,
+        spread: 70,
+        origin: { x: originX, y: originY },
+        colors: ['#e2a89d', '#b82b40', '#ffd700', '#ffffff']
+      });
+
+      gsap.to(waxSealBtn, {
+        scale: 0,
+        opacity: 0,
+        rotation: 45,
+        duration: 0.4,
+        ease: "power2.in",
+        onComplete: () => { waxSealBtn.style.pointerEvents = 'none'; }
+      });
+
+      envelopeTopFlap.style.transform = 'rotateX(180deg)';
+      envelopeTopFlap.style.zIndex = '5';
+      envelopePrompt.style.opacity = '0';
+
+      setTimeout(() => {
+        parchmentLetter.style.pointerEvents = 'auto';
+        parchmentLetter.style.opacity = '1';
+        parchmentLetter.style.transform = 'translate(-50%, -90px) scale(1.02)';
+        parchmentLetter.style.zIndex = '35';
+
+        startTypewriter();
+        initScratchCard();
+      }, 550);
+    }
+
+    function foldBackEnvelope() {
+      if (!isEnvelopeOpen) return;
+      isEnvelopeOpen = false;
+
+      // Restore envelope wrapper bottom spacing smoothly
+      if (envelopeWrapper) {
+        envelopeWrapper.classList.remove('opened');
+      }
+
+      parchmentLetter.style.pointerEvents = 'none';
+      parchmentLetter.style.transform = 'translate(-50%, 48px) scale(0.95)';
+      parchmentLetter.style.opacity = '0';
+
+      setTimeout(() => {
+        envelopeTopFlap.style.transform = 'rotateX(0deg)';
+        envelopeTopFlap.style.zIndex = '30';
+
+        gsap.to(waxSealBtn, {
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: 0.5,
+          delay: 0.3,
+          ease: "back.out(1.7)",
+          onComplete: () => {
+            waxSealBtn.style.pointerEvents = 'auto';
+            envelopePrompt.style.opacity = '1';
+          }
+        });
+      }, 500);
+
+      if (typewriterTimeout) clearTimeout(typewriterTimeout);
+    }
+
+    waxSealBtn.addEventListener('click', openEnvelope);
+    closeLetterBtn.addEventListener('click', foldBackEnvelope);
+
+    function startTypewriter() {
+      const text = appState.letterBody;
+      typedLetterContent.innerHTML = '';
+      if (typewriterTimeout) clearTimeout(typewriterTimeout);
+
+      let index = 0;
+      function typeNext() {
+        if (index < text.length) {
+          typedLetterContent.innerHTML += text.charAt(index);
+          index++;
+          typewriterTimeout = setTimeout(typeNext, Math.random() * 25 + 20);
+        }
+      }
+      typeNext();
+    }
+
+    /* ==========================================================
+       7. SCRATCH-OFF FOIL MECHANICS
+       ========================================================== */
+    const scratchCanvas = document.getElementById('scratchCanvas');
+    const sCtx = scratchCanvas.getContext('2d');
+    let isScratching = false;
+
+    function initScratchCard() {
+      const rect = scratchCanvas.getBoundingClientRect();
+      scratchCanvas.width = rect.width;
+      scratchCanvas.height = rect.height;
+
+      const foil = sCtx.createLinearGradient(0, 0, scratchCanvas.width, scratchCanvas.height);
+      foil.addColorStop(0, '#c79288');
+      foil.addColorStop(0.3, '#f2d1c9');
+      foil.addColorStop(0.5, '#ad6f64');
+      foil.addColorStop(0.7, '#fce4de');
+      foil.addColorStop(1, '#9b5d52');
+
+      sCtx.globalCompositeOperation = 'source-over';
+      sCtx.fillStyle = foil;
+      sCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+
+      sCtx.fillStyle = '#6b2d24';
+      sCtx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+      sCtx.textAlign = 'center';
+      sCtx.textBaseline = 'middle';
+      sCtx.fillText('✦ SCRATCH TO REVEAL SECRET ✦', scratchCanvas.width / 2, scratchCanvas.height / 2);
+    }
+
+    function scratch(x, y) {
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.beginPath();
+      sCtx.arc(x, y, 16, 0, Math.PI * 2);
+      sCtx.fill();
+      checkScratchReveal();
+    }
+
+    function getCoords(e, el) {
+      const rect = el.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    scratchCanvas.addEventListener('mousedown', (e) => {
+      isScratching = true;
+      const { x, y } = getCoords(e, scratchCanvas);
+      scratch(x, y);
+    });
+    window.addEventListener('mouseup', () => { isScratching = false; });
+    scratchCanvas.addEventListener('mousemove', (e) => {
+      if (!isScratching) return;
+      const { x, y } = getCoords(e, scratchCanvas);
+      scratch(x, y);
+    });
+    scratchCanvas.addEventListener('touchstart', (e) => {
+      isScratching = true;
+      const { x, y } = getCoords(e, scratchCanvas);
+      scratch(x, y);
+    }, { passive: true });
+    scratchCanvas.addEventListener('touchend', () => { isScratching = false; });
+    scratchCanvas.addEventListener('touchmove', (e) => {
+      if (!isScratching) return;
+      const { x, y } = getCoords(e, scratchCanvas);
+      scratch(x, y);
+    }, { passive: true });
+
+    function checkScratchReveal() {
+      if (Math.random() > 0.15) return;
+      try {
+        const imgData = sCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height);
+        let clearCount = 0;
+        for (let i = 3; i < imgData.data.length; i += 16) {
+          if (imgData.data[i] === 0) clearCount++;
+        }
+        if (clearCount > (imgData.data.length / 16) * 0.45) {
+          sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+          confetti({
+            particleCount: 30,
+            spread: 60,
+            colors: ['#f43f5e', '#fbbf24', '#ffffff']
+          });
+        }
+      } catch(e) {}
+    }
+
+    /* ==========================================================
+       8. DRAGGABLE POLAROIDS & REASONS JAR
+       ========================================================== */
+    gsap.registerPlugin(Draggable);
+
+    const initialPositions = [
+      { id: '#polaroid1', rotation: -6 },
+      { id: '#polaroid2', rotation: 4 },
+      { id: '#polaroid3', rotation: -2 }
+    ];
+
+    let draggableInstances = [];
+
+    function setupDraggables() {
+      draggableInstances = [];
+      initialPositions.forEach((pos) => {
+        const el = document.querySelector(pos.id);
+        if (!el) return;
+
+        gsap.set(el, { x: 0, y: 0, rotation: pos.rotation });
+        let isDragging = false;
+
+        const instances = Draggable.create(el, {
+          bounds: "#polaroidArea",
+          edgeResistance: 0.65,
+          onPress: function() {
+            isDragging = false;
+            document.querySelectorAll('.polaroid').forEach(p => p.style.zIndex = 10);
+            el.style.zIndex = 30;
+          },
+          onDrag: function() { isDragging = true; },
+          onRelease: function() {
+            gsap.to(el, { rotation: pos.rotation + (Math.random() * 4 - 2), duration: 0.3 });
+          }
+        });
+
+        if (instances && instances[0]) {
+          draggableInstances.push(instances[0]);
+        }
+
+        el.addEventListener('click', (e) => {
+          if (!isDragging) {
+            el.classList.toggle('flipped');
+          }
+        });
+      });
+    }
+    setupDraggables();
+
+    const resetPolaroidsBtn = document.getElementById('resetPolaroidsBtn');
+    if (resetPolaroidsBtn) {
+      resetPolaroidsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const icon = document.getElementById('resetBtnIcon');
+        if (icon) icon.classList.add('fa-spin');
+
+        initialPositions.forEach((pos) => {
+          const el = document.querySelector(pos.id);
+          if (!el) return;
+          el.classList.remove('flipped');
+          const d = Draggable.get(el);
+          gsap.killTweensOf(el);
+          gsap.to(el, {
+            x: 0,
+            y: 0,
+            rotation: pos.rotation,
+            duration: 0.6,
+            ease: "power2.out",
+            onUpdate: () => { if (d) d.update(); },
+            onComplete: () => {
+              if (d) d.update();
+              if (icon) icon.classList.remove('fa-spin');
+            }
+          });
+        });
+
+        showToast("Desk Tidied!", "Polaroid memories returned to original positions.");
+      });
+    }
+
+    const jarContainer = document.getElementById('jarContainer');
+    const reasonCard = document.getElementById('reasonCard');
+    const reasonText = document.getElementById('reasonText');
+    const drawAnotherReasonBtn = document.getElementById('drawAnotherReasonBtn');
+
+    function drawRandomReason() {
+      const randomReason = REASONS_LIST[Math.floor(Math.random() * REASONS_LIST.length)];
+      reasonText.innerText = `"${randomReason}"`;
+      reasonCard.classList.remove('hidden');
+
+      confetti({
+        particleCount: 25,
+        spread: 50,
+        origin: { y: 0.75 },
+        colors: ['#e11d48', '#fb7185', '#f59e0b']
+      });
+
+      gsap.fromTo(reasonCard, 
+        { scale: 0.85, opacity: 0, y: 15 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.7)" }
+      );
+    }
+    jarContainer.addEventListener('click', drawRandomReason);
+    drawAnotherReasonBtn.addEventListener('click', drawRandomReason);
+
+    /* ==========================================================
+       9. "OPEN WHEN..." VAULT MODAL LOGIC
+       ========================================================== */
+    const openWhenModal = document.getElementById('openWhenModal');
+    const vaultModalTag = document.getElementById('vaultModalTag');
+    const vaultModalTitle = document.getElementById('vaultModalTitle');
+    const vaultModalBody = document.getElementById('vaultModalBody');
+    const closeVaultModalBtn = document.getElementById('closeVaultModalBtn');
+    const vaultConfirmCloseBtn = document.getElementById('vaultConfirmCloseBtn');
+
+    document.querySelectorAll('.open-when-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const vaultKey = card.dataset.vault;
+        const letter = VAULT_LETTERS[vaultKey];
+        if (!letter) return;
+
+        vaultModalTag.innerText = letter.tag;
+        vaultModalTitle.innerText = letter.title;
+        vaultModalBody.innerText = letter.body;
+
+        openWhenModal.classList.remove('pointer-events-none', 'opacity-0');
+        openWhenModal.classList.add('opacity-100');
+
+        confetti({
+          particleCount: 35,
+          spread: 60,
+          colors: ['#f43f5e', '#ffd700', '#ffffff']
+        });
+      });
+    });
+
+    function closeVaultModal() {
+      openWhenModal.classList.add('opacity-0', 'pointer-events-none');
+      openWhenModal.classList.remove('opacity-100');
+    }
+    closeVaultModalBtn.addEventListener('click', closeVaultModal);
+    vaultConfirmCloseBtn.addEventListener('click', closeVaultModal);
+
+    /* ==========================================================
+       10. LOVE LOCKS BRIDGE LOGIC
+       ========================================================== */
+    const snapLockBtn = document.getElementById('snapLockBtn');
+    const inputLockInitials = document.getElementById('inputLockInitials');
+    const bridgeInitialsDisplay = document.getElementById('bridgeInitialsDisplay');
+    const lockShackle = document.getElementById('lockShackle');
+    const fallingKey = document.getElementById('fallingKey');
+    const lockStatusMessage = document.getElementById('lockStatusMessage');
+
+    snapLockBtn.addEventListener('click', () => {
+      const initials = inputLockInitials.value.trim().toUpperCase() || "E + L";
+      appState.lockInitials = initials;
+      bridgeInitialsDisplay.innerText = initials;
+
+      // Play authentic mechanical snapping audio click with Web Audio
+      initAudioContext();
+      if (audioCtx) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.09);
+      }
+
+      // Snap Shackle Down Animation
+      gsap.to(lockShackle, {
+        y: 8,
+        duration: 0.15,
+        ease: "power3.in",
+        onComplete: () => {
+          // Animate Key Falling into river
+          fallingKey.classList.remove('hidden');
+          gsap.fromTo(fallingKey, 
+            { x: 0, y: 0, opacity: 1, rotation: 0 },
+            { 
+              y: 120, 
+              rotation: 180, 
+              opacity: 0, 
+              duration: 1.2, 
+              ease: "power1.in",
+              onComplete: () => {
+                fallingKey.classList.add('hidden');
+                lockStatusMessage.innerText = `Padlock for "${initials}" locked forever! The key has sunk into the Seine river.`;
+                showToast("Locked Forever!", `Padlock ${initials} sealed on the bridge.`);
+                confetti({
+                  particleCount: 40,
+                  spread: 70,
+                  colors: ['#e2a89d', '#ffd700']
+                });
+              }
+            }
+          );
+        }
+      });
+    });
+
+    /* ==========================================================
+       11. CELESTIAL "OUR NIGHT SKY" CONSTELLATION MAP
+       ========================================================== */
+    const constCanvas = document.getElementById('constellationCanvas');
+    const constCtx = constCanvas.getContext('2d');
+    const starTooltip = document.getElementById('starTooltip');
+    const starTooltipTitle = document.getElementById('starTooltipTitle');
+    const starTooltipDate = document.getElementById('starTooltipDate');
+
+    const starNodes = [
+      { x: 0.2, y: 0.4, title: "Our First Coffee", date: "Oct 2022", connected: true },
+      { x: 0.35, y: 0.25, title: "First Midnight Walk", date: "Nov 2022", connected: true },
+      { x: 0.5, y: 0.4, title: "The Day We Made It Official", date: "Dec 2022", connected: true },
+      { x: 0.65, y: 0.25, title: "First Ocean Sunset", date: "July 2023", connected: true },
+      { x: 0.8, y: 0.4, title: "New Year's Eve Kiss", date: "Jan 2024", connected: true },
+      { x: 0.5, y: 0.75, title: "Our Forever Promise", date: "Infinite", connected: true }
+    ];
+
+    function initConstellations() {
+      const rect = constCanvas.getBoundingClientRect();
+      constCanvas.width = rect.width;
+      constCanvas.height = rect.height;
+      drawConstellations();
+    }
+
+    function drawConstellations() {
+      constCtx.clearRect(0, 0, constCanvas.width, constCanvas.height);
+
+      // Draw faint background stars
+      constCtx.fillStyle = 'rgba(255,255,255,0.4)';
+      for (let i = 0; i < 60; i++) {
+        const x = (Math.sin(i * 99) * 0.5 + 0.5) * constCanvas.width;
+        const y = (Math.cos(i * 33) * 0.5 + 0.5) * constCanvas.height;
+        constCtx.fillRect(x, y, 1.5, 1.5);
+      }
+
+      // Draw glowing heart constellation lines
+      constCtx.beginPath();
+      constCtx.strokeStyle = 'rgba(244, 114, 182, 0.65)';
+      constCtx.lineWidth = 2;
+      constCtx.setLineDash([4, 4]);
+
+      // Connect into a heart shape
+      const sequence = [0, 1, 2, 3, 4, 5, 0];
+      sequence.forEach((idx, i) => {
+        const node = starNodes[idx];
+        const px = node.x * constCanvas.width;
+        const py = node.y * constCanvas.height;
+        if (i === 0) constCtx.moveTo(px, py);
+        else constCtx.lineTo(px, py);
+      });
+      constCtx.stroke();
+      constCtx.setLineDash([]);
+
+      // Draw Star Nodes
+      starNodes.forEach((node) => {
+        const px = node.x * constCanvas.width;
+        const py = node.y * constCanvas.height;
+
+        // Glow ring
+        constCtx.beginPath();
+        constCtx.arc(px, py, 12, 0, Math.PI * 2);
+        constCtx.fillStyle = 'rgba(234, 179, 8, 0.2)';
+        constCtx.fill();
+
+        // Core star
+        constCtx.beginPath();
+        constCtx.arc(px, py, 5, 0, Math.PI * 2);
+        constCtx.fillStyle = '#fef08a';
+        constCtx.shadowColor = '#fbbf24';
+        constCtx.shadowBlur = 10;
+        constCtx.fill();
+        constCtx.shadowBlur = 0;
+      });
+    }
+
+    constCanvas.addEventListener('click', (e) => {
+      const rect = constCanvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      let found = null;
+      starNodes.forEach(node => {
+        const px = node.x * constCanvas.width;
+        const py = node.y * constCanvas.height;
+        const dist = Math.hypot(cx - px, cy - py);
+        if (dist < 20) found = node;
+      });
+
+      if (found) {
+        starTooltipTitle.innerText = found.title;
+        starTooltipDate.innerText = found.date;
+        starTooltip.style.left = `${cx + 10}px`;
+        starTooltip.style.top = `${cy - 20}px`;
+        starTooltip.classList.remove('hidden');
+
+        confetti({
+          particleCount: 15,
+          spread: 40,
+          origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+          colors: ['#ffd700', '#f472b6']
+        });
+      } else {
+        starTooltip.classList.add('hidden');
+      }
+    });
+
+    /* ==========================================================
+       12. RELATIONSHIP PASSPORT / BUCKET LIST
+       ========================================================== */
+    document.querySelectorAll('.bucket-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const stamp = item.querySelector('.rubber-stamp');
+        const icon = item.querySelector('i');
+        const isCompleted = !stamp.classList.contains('hidden');
+
+        if (isCompleted) {
+          stamp.classList.add('hidden');
+          icon.className = 'fa-regular fa-square text-base text-stone-500';
+        } else {
+          stamp.classList.remove('hidden');
+          icon.className = 'fa-regular fa-square-check text-base text-rose-800';
+
+          // Animate Rubber Stamp Slam
+          gsap.fromTo(stamp, 
+            { scale: 2.2, opacity: 0, rotation: 15 },
+            { scale: 1, opacity: 0.92, rotation: -10, duration: 0.35, ease: "back.out(2)" }
+          );
+
+          confetti({
+            particleCount: 20,
+            spread: 40,
+            colors: ['#b91c1c', '#f59e0b']
+          });
+        }
+      });
+    });
+
+    /* ==========================================================
+       13. BIOMETRIC THUMBPRINT HEARTBEAT SENSOR
+       ========================================================== */
+    const thumbprintBtn = document.getElementById('thumbprintBtn');
+    const heartbeatProgressCircle = document.getElementById('heartbeatProgressCircle');
+    const heartbeatLabel = document.getElementById('heartbeatLabel');
+    let heartbeatHoldTimer = null;
+    let heartbeatInterval = null;
+
+    function playHeartbeatThump() {
+      initAudioContext();
+      if (!audioCtx) return;
+
+      // Real acoustic thump-thump cardiac synthesis
+      const t = audioCtx.currentTime;
+
+      // Lub
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.frequency.setValueAtTime(65, t);
+      osc1.frequency.exponentialRampToValueAtTime(30, t + 0.12);
+      gain1.gain.setValueAtTime(0.35, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start(t);
+      osc1.stop(t + 0.13);
+
+      // Dub
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.frequency.setValueAtTime(75, t + 0.18);
+      osc2.frequency.exponentialRampToValueAtTime(35, t + 0.3);
+      gain2.gain.setValueAtTime(0.28, t + 0.18);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.start(t + 0.18);
+      osc2.stop(t + 0.31);
+    }
+
+    function startHeartbeatHold() {
+      playHeartbeatThump();
+      heartbeatInterval = setInterval(playHeartbeatThump, 880); // ~68 BPM
+
+      thumbprintBtn.classList.add('fingerprint-glow');
+      heartbeatLabel.innerText = "Syncing Heartbeats...";
+
+      gsap.to(heartbeatProgressCircle, {
+        rotation: 360,
+        borderColor: '#f43f5e',
+        duration: 3,
+        ease: "linear"
+      });
+
+      heartbeatHoldTimer = setTimeout(() => {
+        heartbeatLabel.innerText = "Heartbeats Perfectly Synced!";
+        showToast("Heartbeats In Sync", "Your loving pulse was sent across the stars.");
+        confetti({
+          particleCount: 60,
+          spread: 90,
+          origin: { y: 0.6 },
+          colors: ['#f43f5e', '#fb7185', '#ffd700']
+        });
+      }, 3000);
+    }
+
+    function stopHeartbeatHold() {
+      if (heartbeatHoldTimer) clearTimeout(heartbeatHoldTimer);
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      thumbprintBtn.classList.remove('fingerprint-glow');
+      heartbeatLabel.innerText = "Press & Hold Thumb";
+      gsap.killTweensOf(heartbeatProgressCircle);
+      heartbeatProgressCircle.style.borderColor = 'rgba(244, 63, 94, 0.6)';
+    }
+
+    thumbprintBtn.addEventListener('mousedown', startHeartbeatHold);
+    thumbprintBtn.addEventListener('mouseup', stopHeartbeatHold);
+    thumbprintBtn.addEventListener('mouseleave', stopHeartbeatHold);
+    thumbprintBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHeartbeatHold(); });
+    thumbprintBtn.addEventListener('touchend', stopHeartbeatHold);
+
+    /* ==========================================================
+       14. STEAMY RAINY WINDOW FOG-WIPE
+       ========================================================== */
+    const steamyWindowBtn = document.getElementById('steamyWindowBtn');
+    const steamyWindowModal = document.getElementById('steamyWindowModal');
+    const closeSteamyWindowBtn = document.getElementById('closeSteamyWindowBtn');
+    const fogCanvas = document.getElementById('fogCanvas');
+    const fCtx = fogCanvas.getContext('2d');
+    let isWipingFog = false;
+
+    function initFog() {
+      const rect = fogCanvas.getBoundingClientRect();
+      fogCanvas.width = rect.width;
+      fogCanvas.height = rect.height;
+
+      // Realistic condensation fog
+      fCtx.globalCompositeOperation = 'source-over';
+      fCtx.fillStyle = 'rgba(220, 235, 245, 0.88)';
+      fCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+
+      // Rain streaking effect on glass
+      fCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      fCtx.lineWidth = 2;
+      for (let i = 0; i < 35; i++) {
+        const x = Math.random() * fogCanvas.width;
+        const y = Math.random() * fogCanvas.height;
+        const len = Math.random() * 40 + 20;
+        fCtx.beginPath();
+        fCtx.moveTo(x, y);
+        fCtx.lineTo(x + (Math.random() - 0.5) * 4, y + len);
+        fCtx.stroke();
+      }
+    }
+
+    function wipeFog(x, y) {
+      fCtx.globalCompositeOperation = 'destination-out';
+      fCtx.beginPath();
+      fCtx.arc(x, y, 28, 0, Math.PI * 2);
+      fCtx.fill();
+    }
+
+    steamyWindowBtn.addEventListener('click', () => {
+      steamyWindowModal.classList.remove('pointer-events-none', 'opacity-0');
+      steamyWindowModal.classList.add('opacity-100');
+      setTimeout(initFog, 80);
+    });
+
+    closeSteamyWindowBtn.addEventListener('click', () => {
+      steamyWindowModal.classList.add('opacity-0', 'pointer-events-none');
+      steamyWindowModal.classList.remove('opacity-100');
+    });
+
+    fogCanvas.addEventListener('mousedown', (e) => {
+      isWipingFog = true;
+      const { x, y } = getCoords(e, fogCanvas);
+      wipeFog(x, y);
+    });
+    window.addEventListener('mouseup', () => isWipingFog = false);
+    fogCanvas.addEventListener('mousemove', (e) => {
+      if (!isWipingFog) return;
+      const { x, y } = getCoords(e, fogCanvas);
+      wipeFog(x, y);
+    });
+    fogCanvas.addEventListener('touchstart', (e) => {
+      isWipingFog = true;
+      const { x, y } = getCoords(e, fogCanvas);
+      wipeFog(x, y);
+    }, { passive: true });
+    fogCanvas.addEventListener('touchend', () => isWipingFog = false);
+    fogCanvas.addEventListener('touchmove', (e) => {
+      if (!isWipingFog) return;
+      const { x, y } = getCoords(e, fogCanvas);
+      wipeFog(x, y);
+    }, { passive: true });
+
+    /* ==========================================================
+       15. CUSTOMIZER DRAWER & BASE64 SHARE ENGINE
+       ========================================================== */
+    const customizeDrawer = document.getElementById('customizeDrawer');
+    const customizeDrawerBackdrop = document.getElementById('customizeDrawerBackdrop');
+    const openCustomizeBtn = document.getElementById('openCustomizeBtn');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const applyChangesBtn = document.getElementById('applyChangesBtn');
+    const copyShareLinkBtn = document.getElementById('copyShareLinkBtn');
+
+    function openDrawer() {
+      customizeDrawerBackdrop.classList.remove('pointer-events-none', 'opacity-0');
+      customizeDrawerBackdrop.classList.add('opacity-100');
+      customizeDrawer.classList.remove('translate-x-full');
+    }
+
+    function closeDrawer() {
+      customizeDrawerBackdrop.classList.add('opacity-0', 'pointer-events-none');
+      customizeDrawerBackdrop.classList.remove('opacity-100');
+      customizeDrawer.classList.add('translate-x-full');
+    }
+
+    openCustomizeBtn.addEventListener('click', openDrawer);
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    customizeDrawerBackdrop.addEventListener('click', closeDrawer);
+
+    // Setup device file upload listeners for Polaroids 1, 2, and 3
+    function bindPolaroidFileUpload(fileInputId, imgElementId, polaroidIndex, urlInputId, infoBoxId, thumbId, nameId, clearBtnId) {
+      const fileInput = document.getElementById(fileInputId);
+      const urlInput = document.getElementById(urlInputId);
+      const infoBox = document.getElementById(infoBoxId);
+      const thumb = document.getElementById(thumbId);
+      const nameEl = document.getElementById(nameId);
+      const clearBtn = document.getElementById(clearBtnId);
+
+      if (!fileInput) return;
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result;
+          if (typeof result === 'string') {
+            const imgEl = document.getElementById(imgElementId);
+            if (imgEl) imgEl.src = result;
+
+            if (urlInput) urlInput.value = "";
+            if (infoBox) infoBox.classList.remove('hidden');
+            if (thumb) thumb.src = result;
+            if (nameEl) nameEl.innerText = file.name;
+
+            if (appState.polaroids[polaroidIndex]) {
+              appState.polaroids[polaroidIndex].img = result;
+            }
+
+            showToast("Photo Updated!", `Polaroid #${polaroidIndex + 1} updated with local image.`);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          fileInput.value = "";
+          if (infoBox) infoBox.classList.add('hidden');
+          const fallback = DEFAULT_DATA.polaroids[polaroidIndex].img;
+          const imgEl = document.getElementById(imgElementId);
+          if (imgEl) imgEl.src = fallback;
+          if (appState.polaroids[polaroidIndex]) {
+            appState.polaroids[polaroidIndex].img = fallback;
+          }
+          if (urlInput) urlInput.value = fallback;
+        });
+      }
+    }
+
+    bindPolaroidFileUpload('filePolaroid1', 'polaroidImg1', 0, 'inputPolaroidImg1', 'fileInfoPolaroid1', 'thumbPolaroid1', 'fileNamePolaroid1', 'clearPolaroid1Btn');
+    bindPolaroidFileUpload('filePolaroid2', 'polaroidImg2', 1, 'inputPolaroidImg2', 'fileInfoPolaroid2', 'thumbPolaroid2', 'fileNamePolaroid2', 'clearPolaroid2Btn');
+    bindPolaroidFileUpload('filePolaroid3', 'polaroidImg3', 2, 'inputPolaroidImg3', 'fileInfoPolaroid3', 'thumbPolaroid3', 'fileNamePolaroid3', 'clearPolaroid3Btn');
+
+    function collectFormState() {
+      appState.names = document.getElementById('inputCoupleNames').value || "Elena & Lucas";
+      appState.anniversary = document.getElementById('inputAnniversaryDate').value || "2022-10-14";
+      appState.letterTitle = document.getElementById('inputLetterTitle').value || "To My Dearest Heart";
+      appState.letterBody = document.getElementById('inputLetterBody').value || DEFAULT_DATA.letterBody;
+      appState.secretNote = document.getElementById('inputSecretMessage').value || "You make every day brighter.";
+      appState.lockInitials = document.getElementById('inputCustomLockInitials').value || "E + L";
+      
+      const presetSelect = document.getElementById('presetSongSelect');
+      if (presetSelect && presetSelect.value !== 'custom') {
+        currentTrackIndex = parseInt(presetSelect.value, 10) || 0;
+        appState.audioUrl = "";
+      } else if (!localAudioBlobUrl) {
+        appState.audioUrl = document.getElementById('inputCustomAudio').value || "";
+      }
+
+      const p1Url = document.getElementById('inputPolaroidImg1').value;
+      if (p1Url) appState.polaroids[0].img = p1Url;
+      appState.polaroids[0].cap = document.getElementById('inputPolaroidCap1').value || DEFAULT_DATA.polaroids[0].cap;
+
+      const p2Url = document.getElementById('inputPolaroidImg2').value;
+      if (p2Url) appState.polaroids[1].img = p2Url;
+      appState.polaroids[1].cap = document.getElementById('inputPolaroidCap2').value || DEFAULT_DATA.polaroids[1].cap;
+
+      const p3Url = document.getElementById('inputPolaroidImg3').value;
+      if (p3Url) appState.polaroids[2].img = p3Url;
+      appState.polaroids[2].cap = document.getElementById('inputPolaroidCap3').value || DEFAULT_DATA.polaroids[2].cap;
+    }
+
+    applyChangesBtn.addEventListener('click', () => {
+      collectFormState();
+      syncStateToUI();
+      updateLoveCounter();
+      refreshAudioSourceInfo();
+      closeDrawer();
+      showToast("Customization Applied!", "Your audio and keepsake have been updated.");
+    });
+
+    copyShareLinkBtn.addEventListener('click', () => {
+      collectFormState();
+      syncStateToUI();
+
+      const jsonStr = JSON.stringify(appState);
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+      const shareUrl = `${window.location.origin}${window.location.pathname}#keepsake=${encoded}`;
+
+      const copySuccess = copyTextToClipboard(shareUrl);
+      if (copySuccess) {
+        showToast("Shareable Link Copied!", "Send this URL to your partner via chat or text.");
+        confetti({
+          particleCount: 50,
+          spread: 80,
+          colors: ['#e2a89d', '#ffd700', '#ffffff']
+        });
+      } else {
+        showToast("Ready to Share!", "Link generated in your browser bar.");
+      }
+      closeDrawer();
+    });
+
+    function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text);
+        return true;
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          textArea.remove();
+          return true;
+        } catch (err) {
+          textArea.remove();
+          return false;
+        }
+      }
+    }
+
+    function showToast(title, message) {
+      const toast = document.getElementById('customToast');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = message;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 4000);
+    }
+
+    window.addEventListener('load', () => {
+      loadStateFromUrl();
+      syncStateToUI();
+      updateLoveCounter();
+      setInterval(updateLoveCounter, 1000);
+    });
+
+  </script>
+</body>
+</html>
